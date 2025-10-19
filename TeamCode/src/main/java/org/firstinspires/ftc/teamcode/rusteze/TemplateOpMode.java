@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 
 @TeleOp(name="Template")
-//@Disabled
+@Disabled
 public class TemplateOpMode extends LinearOpMode {
     private ElapsedTime runtime = new ElapsedTime();
 
