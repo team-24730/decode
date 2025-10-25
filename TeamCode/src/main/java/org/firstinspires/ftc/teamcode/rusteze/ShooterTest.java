@@ -21,6 +21,8 @@ public class ShooterTest extends LinearOpMode {
     private DcMotorEx flywheelRight;
     private CRServo hood;
 
+    public static int targetRPM;
+
     @Override
     public void runOpMode() {
 
@@ -30,7 +32,7 @@ public class ShooterTest extends LinearOpMode {
 
         flywheelLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         flywheelLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        flywheelRight.setDirection(DcMotorSimple.Direction.REVERSE);
+        flywheelRight.setDirection(DcMotorSimple.Direction.FORWARD);
         flywheelRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
         waitForStart();
@@ -40,7 +42,10 @@ public class ShooterTest extends LinearOpMode {
             flywheelLeft.setPower(gamepad1.right_trigger);
             flywheelRight.setPower(gamepad1.right_trigger);
 
-            hood.setPower(-gamepad1.left_stick_y);
+            // hood.setPower(-gamepad1.left_stick_y);
+
+            telemetry.addData("Target RPM", targetRPM);
+            telemetry.update();
 
         }
     }
