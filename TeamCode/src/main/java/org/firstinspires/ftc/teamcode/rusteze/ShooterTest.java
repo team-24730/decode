@@ -1,18 +1,12 @@
 package org.firstinspires.ftc.teamcode.rusteze;
 
-import android.icu.text.RelativeDateTimeFormatter;
-
 import com.acmerobotics.dashboard.FtcDashboard;
-import com.acmerobotics.dashboard.config.Config;
-import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -50,23 +44,40 @@ public class ShooterTest extends LinearOpMode {
         runtime.reset();
         while(opModeIsActive()) {
 
-            flywheelLeft.setPower(gamepad1.right_trigger);
-            flywheelRight.setPower(gamepad1.right_trigger);
-
             // hood.setPower(-gamepad1.left_stick_y);
+
+
+            // FLYWHEEL PID
+
+            double targetRPM = constants.getTargetRpm();
+            double currentRPM = flywheelRight.getVelocity() / TICKS_PER_REVOLUTION * 60; // Convert ticks per second to revolutions per minute
+            double errorRPM = targetRPM - currentRPM;
+            double kV = constants.getkV();
+            double kP = constants.getkP();
+
+            double vComponent = targetRPM * kV; // Calculate feedforward (SVA) V component
+            double pComponent = errorRPM * kP; // Calculate feedback (PID) P component
+
+            double flywheelPower = Math.min(1, Math.max(    vComponent + pComponent    , 0)); // Calculate and clamp flywheel power between 0 and 1
+
+            flywheelLeft.setPower(flywheelPower);
+            flywheelRight.setPower(flywheelPower);
+
+
+            // TELEMETRY
 
             FtcDashboard dashboard = FtcDashboard.getInstance();
             Telemetry dashboardTelemetry = dashboard.getTelemetry();
 
-            dashboardTelemetry.addData("Target RPM", constants.getTargetRpm());
-            dashboardTelemetry.addData("Current Power", flywheelRight.getPower());
-            dashboardTelemetry.addData("Current TPS", flywheelRight.getVelocity());
-            dashboardTelemetry.addData("Current RPM", flywheelRight.getVelocity() / TICKS_PER_REVOLUTION * 60);
+            dashboardTelemetry.addData("Target RPM", targetRPM);
+            dashboardTelemetry.addData("Current Power", flywheelPower);
+            dashboardTelemetry.addData("Current RPM", currentRPM);
+            dashboardTelemetry.addData("Lowest RPM", 0);
+            dashboardTelemetry.addData("Highest RPM", 6000);
 
-            telemetry.addData("Target RPM", constants.getTargetRpm());
-            telemetry.addData("Current Power", flywheelRight.getPower());
-            telemetry.addData("Current TPS", flywheelRight.getVelocity());
-            telemetry.addData("Current RPM", flywheelRight.getVelocity() / TICKS_PER_REVOLUTION * 60);
+            telemetry.addData("Target RPM", targetRPM);
+            telemetry.addData("Current Power", flywheelPower);
+            telemetry.addData("Current RPM", currentRPM);
 
             telemetry.update();
             dashboardTelemetry.update();
