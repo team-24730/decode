@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 public class Transfer {
     public DcMotorEx transfer;
+    public boolean isEnabled = false;
 
     public Transfer(HardwareMap hwMap) {
         transfer = hwMap.get(DcMotorEx.class, "transfer");
@@ -16,5 +17,15 @@ public class Transfer {
 
     public void setPower(double power) {
         transfer.setPower(power);
+    }
+
+    public void disable() {
+        setPower(0);
+        isEnabled = false;
+    }
+
+    public void enable() {
+        setPower(1);
+        isEnabled = true;
     }
 }
