@@ -11,6 +11,10 @@ public class Outtake {
     private DcMotorEx flywheelBottom;
     private Servo hood;
 
+    double targetRPM = 0;
+    boolean useControlSystem = true;
+    private double rawPower = 0;
+
     private final int TICKS_PER_REVOLUTION = 28;
 
     RobotConstants constants = new RobotConstants();
@@ -28,9 +32,23 @@ public class Outtake {
         flywheelBottom.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
-    public void setFlywheelTarget(double target) {
+    public void setTarget(double target) {
+            targetRPM = target;
+    }
 
-            double targetRPM = target;
+    public void setHood(double target) {
+        hood.setPosition(target);
+    }
+
+    public void setPower(double power) {
+        rawPower = power;
+    }
+
+    public void update() {
+
+        double flywheelPower;
+        if (useControlSystem) {
+            // Calculate control system variables
             double currentRPM = flywheelBottom.getVelocity() / TICKS_PER_REVOLUTION * 60; // Convert ticks per second to revolutions per minute
             double errorRPM = targetRPM - currentRPM;
             double kV = constants.getkV();
@@ -39,14 +57,13 @@ public class Outtake {
             double vComponent = targetRPM * kV; // Calculate feedforward (SVA) V component
             double pComponent = errorRPM * kP; // Calculate feedback (PID) P component
 
-            double flywheelPower = Math.min(1, Math.max(    vComponent + pComponent    , 0)); // Calculate and clamp flywheel power between 0 and 1
+            flywheelPower = Math.min(1, Math.max(vComponent + pComponent, 0)); // Calculate and clamp flywheel power between 0 and 1
+        } else {
+            flywheelPower = rawPower;
+        }
 
-            flywheelTop.setPower(flywheelPower);
-            flywheelBottom.setPower(flywheelPower);
-    }
-
-    public void setPower(double power) {
-        flywheelTop.setPower(power);
-        flywheelBottom.setPower(power);
+        // Set motors to calculated power
+        flywheelTop.setPower(flywheelPower);
+        flywheelBottom.setPower(flywheelPower);
     }
 }
