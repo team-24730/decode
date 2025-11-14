@@ -20,9 +20,9 @@ public class Outtake {
         flywheelBottom = hwMap.get(DcMotorEx.class, "flywheelBottom");
         hood = hwMap.get(Servo.class, "hood");
 
-        flywheelTop.setDirection(DcMotorSimple.Direction.REVERSE);
+        flywheelTop.setDirection(DcMotorSimple.Direction.FORWARD);
         flywheelTop.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        flywheelBottom.setDirection(DcMotorSimple.Direction.FORWARD);
+        flywheelBottom.setDirection(DcMotorSimple.Direction.REVERSE);
         flywheelBottom.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         flywheelBottom.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         flywheelBottom.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -43,5 +43,10 @@ public class Outtake {
 
             flywheelTop.setPower(flywheelPower);
             flywheelBottom.setPower(flywheelPower);
+    }
+
+    public void setPower(double power) {
+        flywheelTop.setPower(power);
+        flywheelBottom.setPower(power);
     }
 }
