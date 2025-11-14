@@ -8,34 +8,43 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 @TeleOp(name="MecanumDriveTeleOp")
 public class MecanumDriveTeleOp extends LinearOpMode {
     private ElapsedTime runtime = new ElapsedTime();
-    Drivetrain drivetrain;
-    Transfer transfer;
-    Intake intake;
-    Outtake outtake;
     double outtakeTarget = 0.0;
 
     @Override
     public void runOpMode() {
 
-        drivetrain = new Drivetrain(hardwareMap);
-        intake = new Intake(hardwareMap);
-        transfer = new Transfer(hardwareMap);
-        outtake = new Outtake(hardwareMap);
+        Robot robot = new Robot(hardwareMap);
 
         waitForStart();
         runtime.reset();
         while(opModeIsActive()) {
 
-            drivetrain.setMotorPowers(-gamepad1.right_stick_y, gamepad1.right_stick_x, gamepad1.left_stick_x);
+            robot.drivetrain.setMotorPowers(-gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x);
 
-            //intake.setPower(-gamepad2.left_stick_y);
+            if (gamepad2.x) {
+                robot.outtake.setFlywheelTarget(2000);
+            }
 
-            transfer.setPower(-gamepad2.right_stick_y);
+            if (gamepad2.y) {
+                robot.outtake.setFlywheelTarget(3500);
+            }
 
-            outtakeTarget += -gamepad2.left_stick_y * 10;
-            outtake.setFlywheelTarget(outtakeTarget);
+            if (gamepad2.b) {
+                robot.outtake.setFlywheelTarget(6000);
+            }
 
-            telemetry.addData("Target RPM", outtakeTarget * 10);
+            if (gamepad2.a) {
+                robot.outtake.setFlywheelTarget(0);
+            }
+
+            if (gamepad2.right_bumper) {
+                robot.transfer.setPower(1);
+            }
+
+            robot.intakeRunning = gamepad2.left_bumper;
+
+            robot.update();
+
             telemetry.update();
 
         }
