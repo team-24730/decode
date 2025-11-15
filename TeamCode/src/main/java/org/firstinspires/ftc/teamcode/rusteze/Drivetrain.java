@@ -1,6 +1,5 @@
 package org.firstinspires.ftc.teamcode.rusteze;
 
-import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -30,9 +29,9 @@ public final class Drivetrain {
     }
 
     public void setMotorPowers (double axial, double lateral, double rotation) {
-        double y = axial;
-        double x = lateral * 1.1; // counteract imperfect strafing
-        double rx = rotation;
+        double y = driveCorrection(axial);
+        double x = driveCorrection(lateral * 1.1) ; // counteract imperfect strafing
+        double rx = driveCorrection(rotation * 0.75);
 
         double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
 
@@ -45,5 +44,9 @@ public final class Drivetrain {
         backLeft  .setPower(backLeftPower);
         backRight .setPower(frontRightPower);
         frontRight.setPower(backRightPower);
+    }
+
+    public double driveCorrection(double x) {
+        return 1.1 * (x * x * Math.signum(x) + 0.15 * x);
     }
 }
