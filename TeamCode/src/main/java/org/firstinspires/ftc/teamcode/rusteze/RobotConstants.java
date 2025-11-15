@@ -7,6 +7,7 @@ public class RobotConstants {
     public static int TARGET_RPM = 0;
     public static double K_V = 0.0002;
     public static double K_P = 0.001;
+    public static double TARGET_HOOD = 0.25;
 
     public int getTargetRpm() {
         return TARGET_RPM;
@@ -17,4 +18,5 @@ public class RobotConstants {
     public double getkP() {
         return K_P;
     }
+    public double getTargetHood() { return TARGET_HOOD; }
 }
