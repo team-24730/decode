@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 public class MecanumDriveTeleOp extends LinearOpMode {
     private ElapsedTime runtime = new ElapsedTime();
     double outtakeTarget = 0.0;
+    boolean intakeToggle = false;
 
     double servoDebug = 0.25;
 
@@ -21,22 +22,29 @@ public class MecanumDriveTeleOp extends LinearOpMode {
         runtime.reset();
         while(opModeIsActive()) {
 
-            robot.drivetrain.setMotorPowers(-gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x*0.75);
+            robot.drivetrain.setMotorPowers(-gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x);
 
             if (gamepad1.x) {
-                robot.setOuttakeTarget(2000);
+                robot.setOuttakeTarget(3000);
+                robot.outtake.setHood(0.97);
             }
 
             if (gamepad1.y) {
-                robot.setOuttakeTarget(3500);
+                robot.setOuttakeTarget(4000);
+                robot.outtake.setHood(0.3);
             }
 
             if (gamepad1.b) {
-                robot.setOuttakeTarget(6000);
+                robot.setOuttakeTarget(4750);
+                robot.outtake.setHood(0.25);
             }
 
             if (gamepad1.a) {
                 robot.setOuttakeTarget(0);
+            }
+
+            if (gamepad1.leftBumperWasPressed()) {
+                intakeToggle = !intakeToggle;
             }
 
             if (gamepad1.right_bumper) {
@@ -45,11 +53,7 @@ public class MecanumDriveTeleOp extends LinearOpMode {
                 robot.transfer.setPower(0);
             }
 
-            servoDebug += -gamepad2.right_stick_y * 0.01;
-            servoDebug = Math.max(Math.min(servoDebug, 0.97), 0.25);
-            robot.outtake.setHood(servoDebug);
-
-            robot.intakeRunning = gamepad1.left_bumper;
+            robot.intakeRunning = intakeToggle;
 
             robot.update();
 
