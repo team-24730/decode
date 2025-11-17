@@ -24,23 +24,25 @@ public class MecanumDriveTeleOp extends LinearOpMode {
 
             robot.drivetrain.setMotorPowers(-gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x);
 
-            if (gamepad1.x) {
-                robot.setOuttakeTarget(3000);
-                robot.outtake.setHood(0.97);
-            }
+            if (!intakeToggle) {
+                if (gamepad1.x) {
+                    robot.setOuttakeTarget(3000);
+                    robot.outtake.setHood(0.97);
+                }
 
-            if (gamepad1.y) {
-                robot.setOuttakeTarget(4000);
-                robot.outtake.setHood(0.3);
-            }
+                if (gamepad1.y) {
+                    robot.setOuttakeTarget(4000);
+                    robot.outtake.setHood(0.3);
+                }
 
-            if (gamepad1.b) {
-                robot.setOuttakeTarget(4750);
-                robot.outtake.setHood(0.25);
-            }
+                if (gamepad1.b) {
+                    robot.setOuttakeTarget(4750);
+                    robot.outtake.setHood(0.25);
+                }
 
-            if (gamepad1.a) {
-                robot.setOuttakeTarget(0);
+                if (gamepad1.a) {
+                    robot.setOuttakeTarget(0);
+                }
             }
 
             if (gamepad1.leftBumperWasPressed()) {
