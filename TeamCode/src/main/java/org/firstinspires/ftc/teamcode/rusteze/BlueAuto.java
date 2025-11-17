@@ -15,8 +15,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.MecanumDrive;
 
-@Autonomous(name="Red Auto")
-public class RedAuto extends LinearOpMode {
+@Autonomous(name="Blue Auto")
+public class BlueAuto extends LinearOpMode {
 
 
     public void runOpMode() {
@@ -113,44 +113,44 @@ public class RedAuto extends LinearOpMode {
         }
 
 
-        Pose2d initialPose = new Pose2d(-56, 34, Math.toRadians(127.8));
+        Pose2d initialPose = new Pose2d(-56, -34, Math.toRadians(-127.8));
         MecanumDrive drive = new MecanumDrive(hardwareMap, initialPose);
 
         TrajectoryActionBuilder closeShootPreload = drive.actionBuilder(initialPose)
-                .strafeTo(new Vector2d(-46, 22));
+                .strafeTo(new Vector2d(-46, -22));
 
-        TrajectoryActionBuilder firstIntakeBack = drive.actionBuilder(new Pose2d(-46, 22, Math.toRadians(127.8)))
-                .strafeToLinearHeading(new Vector2d(-18, 10), Math.toRadians(90));
+        TrajectoryActionBuilder firstIntakeBack = drive.actionBuilder(new Pose2d(-46, -22, Math.toRadians(-127.8)))
+                .strafeToLinearHeading(new Vector2d(-18, 0), Math.toRadians(-90));
 
-        TrajectoryActionBuilder firstIntakeForward = drive.actionBuilder(new Pose2d(-18, 10, Math.toRadians(90)))
-                .strafeToLinearHeading(new Vector2d(-18, 40), Math.toRadians(90));
+        TrajectoryActionBuilder firstIntakeForward = drive.actionBuilder(new Pose2d(-18, 0, Math.toRadians(-90)))
+                .strafeToLinearHeading(new Vector2d(-18, -25), Math.toRadians(-90));
 
-        TrajectoryActionBuilder closeShootFirst = drive.actionBuilder(new Pose2d(-18, 40, Math.toRadians(90)))
+        TrajectoryActionBuilder closeShootFirst = drive.actionBuilder(new Pose2d(-18, -25, Math.toRadians(-90)))
                 .afterTime(0.2, new OuttakeBackwards())
-                .strafeToLinearHeading(new Vector2d(-46, 22), Math.toRadians(127.8));
+                .strafeToLinearHeading(new Vector2d(-46, -22), Math.toRadians(-127.8));
 
-        TrajectoryActionBuilder secondIntakeBack = drive.actionBuilder(new Pose2d(-46, 22, Math.toRadians(127.8)))
-                .strafeToLinearHeading(new Vector2d(7, 10), Math.toRadians(90));
+        TrajectoryActionBuilder secondIntakeBack = drive.actionBuilder(new Pose2d(-46, -22, Math.toRadians(-127.8)))
+                .strafeToLinearHeading(new Vector2d(8, 0), Math.toRadians(-90));
 
-        TrajectoryActionBuilder secondIntakeForward = drive.actionBuilder(new Pose2d(7, 10, Math.toRadians(90)))
-                .strafeToLinearHeading(new Vector2d(7, 40), Math.toRadians(90));
+        TrajectoryActionBuilder secondIntakeForward = drive.actionBuilder(new Pose2d(8, 0, Math.toRadians(-90)))
+                .strafeToLinearHeading(new Vector2d(8, -25), Math.toRadians(-90));
 
-        TrajectoryActionBuilder closeShootSecond = drive.actionBuilder(new Pose2d(7, 40, Math.toRadians(90)))
+        TrajectoryActionBuilder closeShootSecond = drive.actionBuilder(new Pose2d(8, -25, Math.toRadians(-90)))
                 .afterTime(0.2, new OuttakeBackwards())
-                .strafeToLinearHeading(new Vector2d(-46, 22), Math.toRadians(127.8));
+                .strafeToLinearHeading(new Vector2d(-46, -22), Math.toRadians(-127.8));
 
-        TrajectoryActionBuilder thirdIntakeBack = drive.actionBuilder(new Pose2d(-46, 22, Math.toRadians(127.8)))
-                .strafeToLinearHeading(new Vector2d(30, 10), Math.toRadians(90));
+        TrajectoryActionBuilder thirdIntakeBack = drive.actionBuilder(new Pose2d(-46, -22, Math.toRadians(-127.8)))
+                .strafeToLinearHeading(new Vector2d(32, 0), Math.toRadians(-90));
 
-        TrajectoryActionBuilder thirdIntakeForward = drive.actionBuilder(new Pose2d(30, 10, Math.toRadians(90)))
-                .strafeToLinearHeading(new Vector2d(30, 40), Math.toRadians(90));
+        TrajectoryActionBuilder thirdIntakeForward = drive.actionBuilder(new Pose2d(32, 0, Math.toRadians(-90)))
+                .strafeToLinearHeading(new Vector2d(32, -25), Math.toRadians(-90));
 
-        TrajectoryActionBuilder thirdShootSecond = drive.actionBuilder(new Pose2d(30, 40, Math.toRadians(90)))
+        TrajectoryActionBuilder thirdShootSecond = drive.actionBuilder(new Pose2d(32, -25, Math.toRadians(-90)))
                 .afterTime(0.2, new OuttakeBackwards())
-                .strafeToLinearHeading(new Vector2d(-46, 22), Math.toRadians(127.8));
+                .strafeToLinearHeading(new Vector2d(-46, -22), Math.toRadians(-127.8));
 
-        TrajectoryActionBuilder finalPosition = drive.actionBuilder(new Pose2d(-46, 22, Math.toRadians(127.8)))
-                .strafeToLinearHeading(new Vector2d(0, 30), Math.toRadians(0));
+        TrajectoryActionBuilder finalPosition = drive.actionBuilder(new Pose2d(-46, -22, Math.toRadians(-127.8)))
+                .strafeToLinearHeading(new Vector2d(0, -20), Math.toRadians(0));
 
 
 
