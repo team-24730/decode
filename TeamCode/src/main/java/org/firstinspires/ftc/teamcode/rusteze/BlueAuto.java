@@ -113,43 +113,43 @@ public class BlueAuto extends LinearOpMode {
         }
 
 
-        Pose2d initialPose = new Pose2d(-56, -34, Math.toRadians(-127.8));
+        Pose2d initialPose = new Pose2d(-56, -34, Math.toRadians(232.2));
         MecanumDrive drive = new MecanumDrive(hardwareMap, initialPose);
 
         TrajectoryActionBuilder closeShootPreload = drive.actionBuilder(initialPose)
                 .strafeTo(new Vector2d(-46, -22));
 
-        TrajectoryActionBuilder firstIntakeBack = drive.actionBuilder(new Pose2d(-46, -22, Math.toRadians(-127.8)))
-                .strafeToLinearHeading(new Vector2d(-18, 0), Math.toRadians(-90));
+        TrajectoryActionBuilder firstIntakeBack = drive.actionBuilder(new Pose2d(-46, -22, Math.toRadians(232.2)))
+                .strafeToLinearHeading(new Vector2d(-14, 0), Math.toRadians(270));
 
-        TrajectoryActionBuilder firstIntakeForward = drive.actionBuilder(new Pose2d(-18, 0, Math.toRadians(-90)))
-                .strafeToLinearHeading(new Vector2d(-18, -25), Math.toRadians(-90));
+        TrajectoryActionBuilder firstIntakeForward = drive.actionBuilder(new Pose2d(-14, 0, Math.toRadians(270)))
+                .strafeToLinearHeading(new Vector2d(-14, -30), Math.toRadians(270));
 
-        TrajectoryActionBuilder closeShootFirst = drive.actionBuilder(new Pose2d(-18, -25, Math.toRadians(-90)))
+        TrajectoryActionBuilder closeShootFirst = drive.actionBuilder(new Pose2d(-14, -30, Math.toRadians(270)))
                 .afterTime(0.2, new OuttakeBackwards())
-                .strafeToLinearHeading(new Vector2d(-46, -22), Math.toRadians(-127.8));
+                .strafeToLinearHeading(new Vector2d(-46, -22), Math.toRadians(232.2));
 
-        TrajectoryActionBuilder secondIntakeBack = drive.actionBuilder(new Pose2d(-46, -22, Math.toRadians(-127.8)))
-                .strafeToLinearHeading(new Vector2d(8, 0), Math.toRadians(-90));
+        TrajectoryActionBuilder secondIntakeBack = drive.actionBuilder(new Pose2d(-46, -22, Math.toRadians(232.2)))
+                .strafeToLinearHeading(new Vector2d(10, 0), Math.toRadians(270));
 
-        TrajectoryActionBuilder secondIntakeForward = drive.actionBuilder(new Pose2d(8, 0, Math.toRadians(-90)))
-                .strafeToLinearHeading(new Vector2d(8, -25), Math.toRadians(-90));
+        TrajectoryActionBuilder secondIntakeForward = drive.actionBuilder(new Pose2d(10, 0, Math.toRadians(270)))
+                .strafeToLinearHeading(new Vector2d(10, -30), Math.toRadians(270));
 
-        TrajectoryActionBuilder closeShootSecond = drive.actionBuilder(new Pose2d(8, -25, Math.toRadians(-90)))
+        TrajectoryActionBuilder closeShootSecond = drive.actionBuilder(new Pose2d(10, -30, Math.toRadians(270)))
                 .afterTime(0.2, new OuttakeBackwards())
-                .strafeToLinearHeading(new Vector2d(-46, -22), Math.toRadians(-127.8));
+                .strafeToLinearHeading(new Vector2d(-46, -22), Math.toRadians(232.2));
 
-        TrajectoryActionBuilder thirdIntakeBack = drive.actionBuilder(new Pose2d(-46, -22, Math.toRadians(-127.8)))
-                .strafeToLinearHeading(new Vector2d(32, 0), Math.toRadians(-90));
+        TrajectoryActionBuilder thirdIntakeBack = drive.actionBuilder(new Pose2d(-46, -22, Math.toRadians(232.2)))
+                .strafeToLinearHeading(new Vector2d(34, 0), Math.toRadians(270));
 
-        TrajectoryActionBuilder thirdIntakeForward = drive.actionBuilder(new Pose2d(32, 0, Math.toRadians(-90)))
-                .strafeToLinearHeading(new Vector2d(32, -25), Math.toRadians(-90));
+        TrajectoryActionBuilder thirdIntakeForward = drive.actionBuilder(new Pose2d(34, 0, Math.toRadians(270)))
+                .strafeToLinearHeading(new Vector2d(34, -30), Math.toRadians(270));
 
-        TrajectoryActionBuilder thirdShootSecond = drive.actionBuilder(new Pose2d(32, -25, Math.toRadians(-90)))
+        TrajectoryActionBuilder thirdShootSecond = drive.actionBuilder(new Pose2d(34, -30, Math.toRadians(270)))
                 .afterTime(0.2, new OuttakeBackwards())
-                .strafeToLinearHeading(new Vector2d(-46, -22), Math.toRadians(-127.8));
+                .strafeToLinearHeading(new Vector2d(-46, -22), Math.toRadians(232.2));
 
-        TrajectoryActionBuilder finalPosition = drive.actionBuilder(new Pose2d(-46, -22, Math.toRadians(-127.8)))
+        TrajectoryActionBuilder finalPosition = drive.actionBuilder(new Pose2d(-46, -22, Math.toRadians(232.2)))
                 .strafeToLinearHeading(new Vector2d(0, -20), Math.toRadians(0));
 
 
