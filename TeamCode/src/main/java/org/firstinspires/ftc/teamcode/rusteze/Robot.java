@@ -38,7 +38,7 @@ public class Robot {
         // Intake logic
         if (intakeRunning) {
             intake.setPower(1);
-            transfer.setPower(0.3);
+            transfer.setPower(0.6);
             lastIntakeTime = System.currentTimeMillis();
         } else if (System.currentTimeMillis() - lastIntakeTime < 500) {
             intake.setPower(-0.1);
