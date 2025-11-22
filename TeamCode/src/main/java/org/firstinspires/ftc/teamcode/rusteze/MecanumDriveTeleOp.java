@@ -31,7 +31,7 @@ public class MecanumDriveTeleOp extends LinearOpMode {
                 }
 
                 if (gamepad1.y) {
-                    robot.setOuttakeTarget(4250);
+                    robot.setOuttakeTarget(4100);
                     robot.outtake.setHood(0.3);
                 }
 
