@@ -30,7 +30,7 @@ public class RedAuto extends LinearOpMode {
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
                 if (!initialized) {
-                    robot.setOuttakeTarget(3000);
+                    robot.setOuttakeTarget(3200);
                     robot.outtake.setHood(0.97);
                     initialized = true;
                     elapsedTime.reset();
