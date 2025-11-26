@@ -56,7 +56,7 @@ public final class TuningOpModes {
     public static final Class<?> DRIVE_CLASS = MecanumDrive.class;
 
     public static final String GROUP = "quickstart";
-    public static final boolean DISABLED = false;
+    public static final boolean DISABLED = true;  // CHANGED TO TRUE SO THAT TUNING MODES DON'T SHOW UP ON CONTROL HUB
 
     private TuningOpModes() {}
 
