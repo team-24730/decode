@@ -28,10 +28,16 @@ public final class Drivetrain {
         frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 
-    public void setMotorPowers (double axial, double lateral, double rotation) {
+    public void setMotorPowers (double axial, double lateral, double rotation, boolean slowEnabled) {
         double y = driveCorrection(axial);
         double x = driveCorrection(lateral * 1.1) ; // counteract imperfect strafing
         double rx = driveCorrection(rotation * 0.75);
+
+        if (slowEnabled) {
+            y = y * 0.2;
+            x = x * 0.2;
+            rx = rx * 0.2;
+        }
 
         double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
 
