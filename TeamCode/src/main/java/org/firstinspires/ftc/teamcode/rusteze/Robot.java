@@ -115,6 +115,7 @@ public class Robot {
                     drivetrain.setMotorPowers(drivetrainAxial, drivetrainLateral, drivetrainRotation, drivetrainSlowEnabled);
                 }
                 transfer.setPower(0);
+                intake.setPower(0);
                 break;
 
             case OUTTAKE_SHOOT:
@@ -122,6 +123,7 @@ public class Robot {
                     drivetrain.setMotorPowers(drivetrainAxial, drivetrainLateral, drivetrainRotation, drivetrainSlowEnabled);
                 }
                 transfer.setPower(1);
+                intake.setPower(1);
                 break;
 
 
