@@ -40,15 +40,12 @@ public class MeepMeepTesting {
                 .setReversed(false)
                 .splineTo(new Vector2d(34.5, -51), Math.toRadians(270)) // intake pre-placed 3
                 .setReversed(true)
-                .splineTo(new Vector2d(-30, -16), Math.toRadians(55)) // go to shoot position
+                .splineTo(new Vector2d(54, -14), Math.toRadians(25)) // go to shoot position
                 .waitSeconds(1) // shoot fourth time (pre-placed 3)
-                .turnTo(Math.toRadians(205))
-                .setReversed(true)
-                .splineTo(new Vector2d(55, -22), Math.toRadians(45)) // back position for intake hp zone
                 .setReversed(false)
                 .splineTo(new Vector2d(58, -60), Math.toRadians(270)) // intake hp zone
                 .setReversed(true)
-                .splineTo(new Vector2d(-30, -16), Math.toRadians(55)) // go to shoot position
+                .splineTo(new Vector2d(54, -14), Math.toRadians(25)) // go to shoot position
                 .waitSeconds(1) // shoot fifth time (hp zone)
                 .build());
 
