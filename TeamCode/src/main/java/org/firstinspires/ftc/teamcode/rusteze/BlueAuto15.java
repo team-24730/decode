@@ -24,8 +24,8 @@ public class BlueAuto15 extends LinearOpMode {
         Robot robot = new Robot(hardwareMap);
         ElapsedTime elapsedTime = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
 
-        class OuttakeClose implements Action {
-            private boolean initialized = false;
+        class SpinUpFlywheelClose implements Action {
+            boolean initialized = false;
 
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
@@ -35,24 +35,103 @@ public class BlueAuto15 extends LinearOpMode {
                     initialized = true;
                     elapsedTime.reset();
                 }
-
                 packet.put("Elapsed Time", elapsedTime.time());
-                if (elapsedTime.time() < 1500) {
-                    if (elapsedTime.time() > 250) {
-                        robot.transfer.setPower(1);
-                    }
-                    robot.outtake.update();
+
+                if (elapsedTime.time() < 1000) {
+                    robot.outtake.update(); // allow the PID controller a second to spin up the flywheel
                     return true;
                 } else {
-                    robot.setOuttakeTarget(0);
-                    robot.outtake.update();
-                    robot.transfer.setPower(0);
                     return false;
                 }
             }
         }
 
-        class OuttakeBackwards implements Action {
+        class SpinUpFlywheelFar implements Action {
+            boolean initialized = false;
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                if (!initialized) {
+                    robot.setOuttakeTarget(5000);
+                    robot.outtake.setHood(0.25);
+                    robot.outtake.update();
+                    initialized = true;
+                    elapsedTime.reset();
+                }
+                packet.put("Elapsed Time", elapsedTime.time());
+
+                if (elapsedTime.time() < 1500) {
+                    robot.outtake.update(); // allow the PID controller a second and a half to spin up the flywheel
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        }
+
+        class ShootClose implements Action {
+            private boolean initialized = false;
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                if (!initialized) {
+                    robot.intake.setPower(1);
+                    robot.transfer.setPower(1);
+                    initialized = true;
+                    elapsedTime.reset();
+                }
+
+                packet.put("Elapsed Time", elapsedTime.time());
+                if (elapsedTime.time() < 1000) {
+                    robot.outtake.update(); // continue updating the outtake so the PID controller can keep flywheel speed constant as artifacts move through the shooter
+                    return true;
+                } else {
+                    robot.intake.setPower(0);
+                    robot.transfer.setPower(0);
+                    robot.setOuttakeRawPower(0);
+                    robot.outtake.update();
+                    return false;
+                }
+            }
+        }
+
+        class ShootFar implements Action {
+            private boolean initialized = false;
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                if (!initialized) {
+                    robot.intake.setPower(1);
+                    robot.transfer.setPower(0.75);
+                    initialized = true;
+                    elapsedTime.reset();
+                }
+
+                packet.put("Elapsed Time", elapsedTime.time());
+                if (elapsedTime.time() < 1500) {
+                    robot.outtake.update(); // continue updating the outtake so the PID controller can keep flywheel speed constant as artifacts move through the shooter
+                    return true;
+                } else {
+                    robot.intake.setPower(0);
+                    robot.transfer.setPower(0);
+                    robot.setOuttakeRawPower(0);
+                    robot.outtake.update();
+                    return false;
+                }
+            }
+        }
+
+        class IntakeOn implements Action {
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                robot.intake.setPower(1);
+                robot.transfer.setPower(1);
+                packet.put("Intake Enabled", true);
+                return false;
+            }
+        }
+
+        class IntakeOff implements Action {
             private boolean initialized = false;
 
             @Override
@@ -79,83 +158,63 @@ public class BlueAuto15 extends LinearOpMode {
             }
         }
 
-        class IntakeOn implements Action {
-            @Override
-            public boolean run(@NonNull TelemetryPacket packet) {
-                robot.intake.setPower(1);
-                robot.transfer.setPower(1);
-                packet.put("Transfer", true);
-                return false;
-            }
-        }
 
-        class IntakeOff implements Action {
-            private boolean initialized = false;
-
-            @Override
-            public boolean run(@NonNull TelemetryPacket packet) {
-                if (!initialized) {
-                    robot.intake.setPower(-0.1);
-                    robot.transfer.setPower(-0.5);
-                    initialized = true;
-                    elapsedTime.reset();
-                }
-
-                packet.put("Elapsed Time", elapsedTime.time());
-                if (elapsedTime.time() < 500) {
-                    return true;
-                } else {
-                    robot.intake.setPower(0);
-                    robot.transfer.setPower(0);
-                    return false;
-                }
-            }
-        }
-
-
-        Pose2d initialPose = new Pose2d(65.0147, -37.6669, Math.toRadians(-179.808));
+        Pose2d initialPose = new Pose2d(-52, -46, Math.toRadians(235));
         MecanumDrive drive = new MecanumDrive(hardwareMap, initialPose);
 
-        TrajectoryActionBuilder farShootPreload = drive.actionBuilder(initialPose)
-                .splineTo(new Vector2d(63.8587, -39.1769), Math.toRadians(-165.4041));
-
-        TrajectoryActionBuilder wallIntakeHPPre = drive.actionBuilder(new Pose2d(63.8587, -39.1769, Math.toRadians(-165.4041)))
-                .splineTo(new Vector2d(49.8117, -61.1149), Math.toRadians(-11.579));
-
-        TrajectoryActionBuilder wallIntakeHPPost = drive.actionBuilder(new Pose2d(49.8117, -61.1149, Math.toRadians(-11.579)))
-                .splineTo(new Vector2d(62.2813, -62.2142), Math.toRadians(-0.8206));
-
-        TrajectoryActionBuilder mediumShoot1 = drive.actionBuilder(new Pose2d(62.2813, -62.2142, Math.toRadians(-0.8206)))
+        TrajectoryActionBuilder shootPreload = drive.actionBuilder(initialPose)
+                .afterTime(0, new SpinUpFlywheelClose()) // spin up flywheel for close shooting
                 .setReversed(true)
-                .splineTo(new Vector2d(11.035, -14.9189), Math.toRadians(-137.9632));
+                .splineTo(new Vector2d(-30, -16), Math.toRadians(55)); // drive to shooting position for preloads
 
-        TrajectoryActionBuilder intakePreplace1 = drive.actionBuilder(new Pose2d(11.035, -14.9189, Math.toRadians(-137.9632)))
-                .splineTo(new Vector2d(1.4807, -57.2865), Math.toRadians(-90));
+        TrajectoryActionBuilder intakeFirstSpike = shootPreload.endTrajectory().fresh()
+                .setReversed(false)
+                .splineTo(new Vector2d(-13, -51), Math.toRadians(270)); // intake at first spike mark
 
-        TrajectoryActionBuilder gateOpenBack = drive.actionBuilder(new Pose2d(1.4807, -57.2865, Math.toRadians(-90)))
+        TrajectoryActionBuilder shootFirstSpike = intakeFirstSpike.endTrajectory().fresh()
+                .afterTime(0.6, new SpinUpFlywheelClose()) // spin up flywheel for close shooting
                 .setReversed(true)
-                .splineTo(new Vector2d(11.035, -14.9189), Math.toRadians(-137.9632));
+                .splineTo(new Vector2d(-30, -16), Math.toRadians(55)); // go to close shoot position
 
-        TrajectoryActionBuilder gateOpenForwards = drive.actionBuilder(new Pose2d(11.035, -14.9189, Math.toRadians(-137.9632)))
-                .splineTo(new Vector2d(5.316, -41.0164), Math.toRadians(-90));
-
-        TrajectoryActionBuilder mediumShoot2 = drive.actionBuilder(new Pose2d(5.316, -41.0164, Math.toRadians(-90)))
+        TrajectoryActionBuilder openGate = shootFirstSpike.endTrajectory().fresh()
+                .setReversed(false)
+                .splineTo(new Vector2d(-4, -53), Math.toRadians(270)) // open gate
+                .waitSeconds(1) // wait for a second so the gate can open
                 .setReversed(true)
-                .splineTo(new Vector2d(11.035, -14.9189), Math.toRadians(-137.9632));
+                .splineTo(new Vector2d(0, -16), Math.toRadians(90)); // prepare to intake at second spike mark
 
-        TrajectoryActionBuilder intakePreplace2 = drive.actionBuilder(new Pose2d(11.035, -14.9189, Math.toRadians(-137.9632)))
-                .splineTo(new Vector2d(7.5179, -61.8704), Math.toRadians(-90));
+        TrajectoryActionBuilder intakeSecondSpike = openGate.endTrajectory().fresh()
+                .setReversed(false)
+                .splineTo(new Vector2d(11.5, -51), Math.toRadians(270)); // intake at second spike mark
 
-        TrajectoryActionBuilder mediumShoot3 = drive.actionBuilder(new Pose2d(7.5179, -61.8704, Math.toRadians(-90)))
+        TrajectoryActionBuilder shootSecondSpike = intakeSecondSpike.endTrajectory().fresh()
+                .afterTime(0.6, new SpinUpFlywheelClose()) // spin up flywheel for close shooting
                 .setReversed(true)
-                .splineTo(new Vector2d(11.035, -14.9189), Math.toRadians(-137.9632));
+                .splineTo(new Vector2d(-30, -16), Math.toRadians(55)); // go to close shoot position
 
-        TrajectoryActionBuilder intakePreplace3 = drive.actionBuilder(new Pose2d(11.035, -14.9189, Math.toRadians(-137.9632)))
-                .splineTo(new Vector2d(7.5179, -61.8704), Math.toRadians(-90));
-
-        TrajectoryActionBuilder mediumShoot4 = drive.actionBuilder(new Pose2d(7.5179, -61.8704, Math.toRadians(-90)))
+        TrajectoryActionBuilder intakeThirdSpikeBack = shootSecondSpike.endTrajectory().fresh()
+                .turnTo(Math.toRadians(210)) // turn so there is no interference with the opposite side
                 .setReversed(true)
-                .splineTo(new Vector2d(11.035, -14.9189), Math.toRadians(-137.9632));
+                .splineTo(new Vector2d(34.5, -15), Math.toRadians(45)); // prepare to intake at third spike mark
+
+        TrajectoryActionBuilder intakeThirdSpike = intakeThirdSpikeBack.endTrajectory().fresh()
+                .setReversed(false)
+                .splineTo(new Vector2d(34.5, -51), Math.toRadians(270)); // intake at third spike mark
+
+        TrajectoryActionBuilder shootThirdSpike = intakeThirdSpike.endTrajectory().fresh()
+                .afterTime(0.6, new SpinUpFlywheelFar()) // spin up flywheel for far shooting
+                .setReversed(true)
+                .splineTo(new Vector2d(54, -14), Math.toRadians(25)); // go to far shoot position
+
+        TrajectoryActionBuilder intakeHPZone = shootThirdSpike.endTrajectory().fresh()
+                .setReversed(false)
+                .splineTo(new Vector2d(58, -60), Math.toRadians(270)); // intake at hp zone
+
+        TrajectoryActionBuilder shootHPZone = intakeHPZone.endTrajectory().fresh()
+                .afterTime(0.6, new SpinUpFlywheelFar()) // spin up flywheel for far shooting
+                .setReversed(true)
+                .splineTo(new Vector2d(54, -14), Math.toRadians(25)); // go to far shoot position
+
 
 
 
@@ -167,24 +226,40 @@ public class BlueAuto15 extends LinearOpMode {
 
             Actions.runBlocking(
                     new SequentialAction(
-                            farShootPreload.build(),
-                            wallIntakeHPPre.build(),
-                            wallIntakeHPPost.build(),
-                            mediumShoot1.build(),
-                            intakePreplace1.build(),
-                            gateOpenBack.build(),
-                            gateOpenForwards.build(),
-                            mediumShoot2.build(),
-                            intakePreplace2.build(),
-                            mediumShoot3.build(),
-                            intakePreplace3.build(),
-                            mediumShoot4.build()
+                            shootPreload.build(),
+                            new ShootClose(),
+
+                            new IntakeOn(),
+                            intakeFirstSpike.build(),
+                            new IntakeOff(),
+                            shootFirstSpike.build(),
+                            new ShootClose(),
+
+                            openGate.build(),
+
+                            new IntakeOn(),
+                            intakeSecondSpike.build(),
+                            new IntakeOff(),
+                            shootSecondSpike.build(),
+                            new ShootClose(),
+
+                            intakeThirdSpikeBack.build(),
+                            new IntakeOn(),
+                            intakeThirdSpike.build(),
+                            new IntakeOff(),
+                            shootThirdSpike.build(),
+                            new ShootFar(),
+
+                            new IntakeOn(),
+                            intakeHPZone.build(),
+                            new IntakeOff(),
+                            shootHPZone.build(),
+                            new ShootFar()
+
                     )
             );
 
             requestOpModeStop();
-
-            robot.outtake.update();
         }
 
     }
