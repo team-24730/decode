@@ -12,15 +12,13 @@ import org.firstinspires.ftc.robotcore.internal.camera.calibration.PlaceholderCa
 
 @TeleOp(name="MecanumDriveTeleOp")
 public class MecanumDriveTeleOp extends LinearOpMode {
-    private ElapsedTime runtime = new ElapsedTime();
+    private final ElapsedTime runtime = new ElapsedTime();
     double outtakeTarget = 0.0;
     boolean intakeToggle = false;
 
     private Limelight3A limelight;
     private double lastTx = 0;
     private double lowPassYaw = 0;
-    private double limelight_k_P = 0.045;
-    private double limelight_k_S = 0.3;
     private PIDF limelight_PIDF = new PIDF(0.01, 0.035, 0.0025, 0.25, 0.5);
 
     double servoDebug = 0.25;
@@ -34,51 +32,9 @@ public class MecanumDriveTeleOp extends LinearOpMode {
         limelight.pipelineSwitch(8);
         limelight.start();
 
-        if (gamepad2.right_bumper) {
-            limelight_k_P = 100;
-        }
-
         waitForStart();
         runtime.reset();
         while(opModeIsActive()) {
-
-            /*
-
-            if (!intakeToggle) {
-                if (gamepad1.x) {
-                    robot.setOuttakeTarget(3000);
-                    robot.outtake.setHood(0.97);
-                }
-
-                if (gamepad1.y) {
-                    robot.setOuttakeTarget(4100);
-                    robot.outtake.setHood(0.3);
-                }
-
-                if (gamepad1.b) {
-                    robot.setOuttakeTarget(4750);
-                    robot.outtake.setHood(0.25);
-                }
-
-                if (gamepad1.a) {
-                    robot.setOuttakeTarget(0);
-                }
-            }
-
-            if (gamepad1.leftBumperWasPressed()) {
-                intakeToggle = !intakeToggle;
-            }
-
-            if (gamepad1.right_bumper) {
-                robot.transfer.setPower(1);
-            } else if (!robot.dontTurnOffTransfer) {
-                robot.transfer.setPower(0);
-            }
-
-            robot.intakeRunning = intakeToggle;
-
-            */
-
 
             if (gamepad1.leftBumperWasPressed()) {
                 if (robot.getState() == Robot.State.IDLE) {
