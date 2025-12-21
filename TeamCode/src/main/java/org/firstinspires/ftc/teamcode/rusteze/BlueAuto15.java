@@ -21,6 +21,8 @@ public class BlueAuto15 extends LinearOpMode {
 
     public void runOpMode() {
 
+        RobotConstants.teamColor = RobotConstants.Color.BLUE;
+
         Robot robot = new Robot(hardwareMap);
         ElapsedTime elapsedTime = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
 
@@ -30,14 +32,14 @@ public class BlueAuto15 extends LinearOpMode {
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
                 if (!initialized) {
-                    robot.setOuttakeTarget(3200);
-                    robot.outtake.setHood(0.97);
+                    robot.setOuttakeTarget(3500);
+                    robot.outtake.setHood(0.65);
                     initialized = true;
                     elapsedTime.reset();
                 }
                 packet.put("Elapsed Time", elapsedTime.time());
 
-                if (elapsedTime.time() < 1000) {
+                if (elapsedTime.time() < 500) {
                     robot.outtake.update(); // allow the PID controller a second to spin up the flywheel
                     return true;
                 } else {
@@ -52,7 +54,7 @@ public class BlueAuto15 extends LinearOpMode {
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
                 if (!initialized) {
-                    robot.setOuttakeTarget(5000);
+                    robot.setOuttakeTarget(4750);
                     robot.outtake.setHood(0.25);
                     robot.outtake.update();
                     initialized = true;
@@ -165,11 +167,11 @@ public class BlueAuto15 extends LinearOpMode {
         TrajectoryActionBuilder shootPreload = drive.actionBuilder(initialPose)
                 .afterTime(0, new SpinUpFlywheelClose()) // spin up flywheel for close shooting
                 .setReversed(true)
-                .splineTo(new Vector2d(-30, -16), Math.toRadians(55)); // drive to shooting position for preloads
+                .splineTo(new Vector2d(-26, -12), Math.toRadians(55)); // drive to shooting position for preloads
 
         TrajectoryActionBuilder intakeFirstSpike = shootPreload.endTrajectory().fresh()
                 .setReversed(false)
-                .splineTo(new Vector2d(-13, -51), Math.toRadians(270)); // intake at first spike mark
+                .splineTo(new Vector2d(-8, -40), Math.toRadians(270)); // intake at first spike mark
 
         TrajectoryActionBuilder shootFirstSpike = intakeFirstSpike.endTrajectory().fresh()
                 .afterTime(0.6, new SpinUpFlywheelClose()) // spin up flywheel for close shooting
@@ -181,39 +183,40 @@ public class BlueAuto15 extends LinearOpMode {
                 .splineTo(new Vector2d(-4, -53), Math.toRadians(270)) // open gate
                 .waitSeconds(1) // wait for a second so the gate can open
                 .setReversed(true)
-                .splineTo(new Vector2d(0, -16), Math.toRadians(90)); // prepare to intake at second spike mark
+                .splineTo(new Vector2d(3, -3), Math.toRadians(90)); // prepare to intake at second spike mark
 
         TrajectoryActionBuilder intakeSecondSpike = openGate.endTrajectory().fresh()
                 .setReversed(false)
-                .splineTo(new Vector2d(11.5, -51), Math.toRadians(270)); // intake at second spike mark
+                .splineTo(new Vector2d(13, -34), Math.toRadians(270)); // intake at second spike mark
 
         TrajectoryActionBuilder shootSecondSpike = intakeSecondSpike.endTrajectory().fresh()
                 .afterTime(0.6, new SpinUpFlywheelClose()) // spin up flywheel for close shooting
+                .setReversed(false)
                 .setReversed(true)
                 .splineTo(new Vector2d(-30, -16), Math.toRadians(55)); // go to close shoot position
 
         TrajectoryActionBuilder intakeThirdSpikeBack = shootSecondSpike.endTrajectory().fresh()
                 .turnTo(Math.toRadians(210)) // turn so there is no interference with the opposite side
                 .setReversed(true)
-                .splineTo(new Vector2d(34.5, -15), Math.toRadians(45)); // prepare to intake at third spike mark
+                .splineTo(new Vector2d(38, -10), Math.toRadians(45)); // prepare to intake at third spike mark
 
         TrajectoryActionBuilder intakeThirdSpike = intakeThirdSpikeBack.endTrajectory().fresh()
                 .setReversed(false)
-                .splineTo(new Vector2d(34.5, -51), Math.toRadians(270)); // intake at third spike mark
+                .splineTo(new Vector2d(38, -32), Math.toRadians(270)); // intake at third spike mark
 
         TrajectoryActionBuilder shootThirdSpike = intakeThirdSpike.endTrajectory().fresh()
                 .afterTime(0.6, new SpinUpFlywheelFar()) // spin up flywheel for far shooting
                 .setReversed(true)
-                .splineTo(new Vector2d(54, -14), Math.toRadians(25)); // go to far shoot position
+                .splineTo(new Vector2d(56, -14), Math.toRadians(20)); // go to far shoot position
 
         TrajectoryActionBuilder intakeHPZone = shootThirdSpike.endTrajectory().fresh()
                 .setReversed(false)
-                .splineTo(new Vector2d(58, -60), Math.toRadians(270)); // intake at hp zone
+                .splineTo(new Vector2d(62, -46), Math.toRadians(270)); // intake at hp zone
 
         TrajectoryActionBuilder shootHPZone = intakeHPZone.endTrajectory().fresh()
                 .afterTime(0.6, new SpinUpFlywheelFar()) // spin up flywheel for far shooting
                 .setReversed(true)
-                .splineTo(new Vector2d(54, -14), Math.toRadians(25)); // go to far shoot position
+                .splineTo(new Vector2d(54, -14), Math.toRadians(22)); // go to far shoot position
 
 
 
