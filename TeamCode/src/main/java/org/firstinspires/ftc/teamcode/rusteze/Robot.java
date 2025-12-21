@@ -26,6 +26,8 @@ public class Robot {
     public boolean intakeRunning = false;
     public boolean dontTurnOffTransfer = false;
 
+    private double transferSpeed = 1;
+
     long lastIntakeTime = 0;
     boolean turnShooterOffFlag = false;
 
@@ -62,6 +64,10 @@ public class Robot {
 
     public void setState(State state) {
         this.robotState = state;
+    }
+
+    public void setTransferSpeed(double speed) {
+        transferSpeed = speed;
     }
 
     public void update() {
@@ -122,7 +128,7 @@ public class Robot {
                 if (drivetrainEnabled) {
                     drivetrain.setMotorPowers(drivetrainAxial, drivetrainLateral, drivetrainRotation, drivetrainSlowEnabled);
                 }
-                transfer.setPower(1);
+                transfer.setPower(transferSpeed);
                 intake.setPower(1);
                 break;
 
