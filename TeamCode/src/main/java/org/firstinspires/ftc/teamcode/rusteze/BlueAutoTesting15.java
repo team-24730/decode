@@ -4,10 +4,14 @@ import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.Arclength;
 import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.Pose2dDual;
+import com.acmerobotics.roadrunner.PosePath;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
 import com.acmerobotics.roadrunner.Vector2d;
+import com.acmerobotics.roadrunner.VelConstraint;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -16,10 +20,12 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
 
 @Autonomous(name="15 Artifact Blue Auto Testing")
-public class AutoTesting15 extends LinearOpMode {
+public class BlueAutoTesting15 extends LinearOpMode {
 
 
     public void runOpMode() {
+
+        RobotConstants.teamColor = RobotConstants.Color.BLUE;
 
         Robot robot = new Robot(hardwareMap);
         ElapsedTime elapsedTime = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
@@ -30,8 +36,8 @@ public class AutoTesting15 extends LinearOpMode {
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
                 if (!initialized) {
-                    robot.setOuttakeTarget(3200);
-                    robot.outtake.setHood(0.97);
+                    robot.setOuttakeTarget(3350);
+                    robot.outtake.setHood(0.9);
                     initialized = true;
                     elapsedTime.reset();
                 }
@@ -45,6 +51,29 @@ public class AutoTesting15 extends LinearOpMode {
                 }
             }
         }
+
+        class SpinUpFlywheelMedium implements Action {
+            boolean initialized = false;
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                if (!initialized) {
+                    robot.setOuttakeTarget(3700);
+                    robot.outtake.setHood(0.3);
+                    initialized = true;
+                    elapsedTime.reset();
+                }
+                packet.put("Elapsed Time", elapsedTime.time());
+
+                if (elapsedTime.time() < 1500) {
+                    robot.outtake.update(); // allow the PID controller a second to spin up the flywheel
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        }
+
 
         class SpinUpFlywheelFar implements Action {
             boolean initialized = false;
@@ -163,54 +192,126 @@ public class AutoTesting15 extends LinearOpMode {
         MecanumDrive drive = new MecanumDrive(hardwareMap, initialPose);
 
         TrajectoryActionBuilder shootPreload = drive.actionBuilder(initialPose)
-                .afterTime(0, new SpinUpFlywheelClose())
+                /*.afterTime(0, new SpinUpFlywheelClose())
                 .afterTime(0.7, new ShootClose())
                 .strafeTo(new Vector2d(-38, -26)) // drive to preload shooting position
                 .waitSeconds(0.6)
                 .setTangent(0)
-                .splineToLinearHeading(new Pose2d(10, -12, Math.toRadians(270)), Math.toRadians(0)) // get ready to intake at second spike mark
+                .splineToLinearHeading(new Pose2d(14, -10, Math.toRadians(270)), Math.toRadians(0)) // get ready to intake at second spike mark
                 .afterTime(0, new IntakeOn())
-                .strafeTo(new Vector2d(18, -44)) // drive to intake position of second spike mark
+                .strafeTo(new Vector2d(16, -36)) // drive to intake position of second spike mark
                 .afterTime(0, new IntakeOff())
-                .afterTime(0.75, new SpinUpFlywheelClose())
+                .afterTime(0.5, new SpinUpFlywheelClose())
                 .setReversed(true)
                 .splineTo(new Vector2d(-4, -12), Math.toRadians(90)) // drive to second spike mark shooting position
-                .afterTime(0.75, new ShootClose())
+                .afterTime(0.85, new ShootClose())
                 .strafeToLinearHeading(new Vector2d(-34, -26), Math.toRadians(235)) // shoot second spike mark
                 .waitSeconds(0.6)
                 .setReversed(true)
-                .splineTo(new Vector2d(24, -14), Math.toRadians(25)) // prepare to open gate and intake
+                .splineTo(new Vector2d(20, -25), Math.toRadians(25)) // prepare to open gate and intake
                 .setReversed(false)
-                .splineTo(new Vector2d(10, -54), Math.toRadians(244)) // open gate and intake //240
+                .splineTo(new Vector2d(10.75, -52), Math.toRadians(250), new VelConstraint() {
+                    @Override
+                    public double maxRobotVel(@NonNull Pose2dDual<Arclength> pose2dDual, @NonNull PosePath posePath, double v) {
+                        return 20;
+                    }
+                }) // open gate and intake
                 .afterTime(0, new IntakeOn())
-                .waitSeconds(1.5)
+                .waitSeconds(0.5)
+                .strafeTo(new Vector2d(18, -51)) // shuffle around a bit to try to intake more
+                .waitSeconds(0.5)
                 .afterTime(0, new IntakeOff())
-                .afterTime(0.75, new SpinUpFlywheelClose())
+                .afterTime(0.6, new SpinUpFlywheelClose())
                 .setReversed(true)
                 .splineTo(new Vector2d(12, -10), Math.toRadians(90)) // prepare to shoot gate
                 .afterTime(0.9, new ShootClose())
                 .strafeToLinearHeading(new Vector2d(-34, -26), Math.toRadians(235)) // shoot gate
                 .waitSeconds(0.6)
-                .strafeToLinearHeading(new Vector2d(-10, -10), Math.toRadians(255)) // prepare to intake first spike mark
+                .strafeToLinearHeading(new Vector2d(-7, -10), Math.toRadians(255)) // prepare to intake first spike mark
                 .afterTime(0, new IntakeOn())
-                .strafeToLinearHeading(new Vector2d(-10, -46), Math.toRadians(270)) // intake first spike mark
+                .strafeToLinearHeading(new Vector2d(-7, -36), Math.toRadians(270)) // intake first spike mark
                 .afterTime(0, new IntakeOff())
-                .afterTime(0.75, new SpinUpFlywheelClose())
-                .afterTime(1.15, new ShootClose())
+                .afterTime(0.5, new SpinUpFlywheelClose())
+                .afterTime(1.0, new ShootClose())
                 .strafeToLinearHeading(new Vector2d(-34, -26), Math.toRadians(235)) // shoot first spike mark
                 .waitSeconds(0.6)
                 .setReversed(true)
-                .splineTo(new Vector2d(50, -20), Math.toRadians(0)) // prepare to intake third spike mark
+                .splineTo(new Vector2d(45, -20), Math.toRadians(0)) // prepare to intake third spike mark
                 .afterTime(0, new IntakeOn())
                 .setReversed(false)
-                .splineTo(new Vector2d(34, -50), Math.toRadians(270)) // intake third spike mark
+                .splineTo(new Vector2d(32, -36), Math.toRadians(270), new VelConstraint() {
+                    @Override
+                    public double maxRobotVel(@NonNull Pose2dDual<Arclength> pose2dDual, @NonNull PosePath posePath, double v) {
+                        return 100;
+                    }
+                }) // intake third spike mark
                 .afterTime(0, new IntakeOff())
-                .afterTime(0.75, new SpinUpFlywheelClose())
                 .setReversed(true)
-                .splineTo(new Vector2d(-15, -15), Math.toRadians(135)) // prepare to shoot third spike mark
-                .strafeToLinearHeading(new Vector2d(-34, -26), Math.toRadians(235)) // shoot third spike mark
-                .afterTime(0, new ShootClose())
-                .waitSeconds(0.6);
+                .splineTo(new Vector2d(45, -20), Math.toRadians(0)) // prepare to shoot third spike mark
+                .afterTime(0.5, new SpinUpFlywheelClose())
+                .afterTime(2.0, new ShootClose())
+                .setReversed(false)
+                .splineTo(new Vector2d(-34, -26), Math.toRadians(235)) // shoot third spike mark
+                .waitSeconds(0.6); */
+                .afterTime(0, new SpinUpFlywheelClose())
+                .afterTime(0.5, new ShootClose())
+                .strafeTo(new Vector2d(-38, -26)) // drive to preload shooting position
+                .waitSeconds(0.3)
+                .setTangent(0)
+                .strafeToLinearHeading(new Vector2d(14, -5), Math.toRadians(-90)) // get ready to intake at second spike mark
+                .afterTime(0, new IntakeOn())
+                .strafeTo(new Vector2d(14, -35)) // drive to intake position of second spike mark
+                .afterTime(0, new IntakeOff())
+                .afterTime(0.5, new SpinUpFlywheelMedium())
+                .afterTime(1.2, new ShootClose())
+                .strafeToLinearHeading(new Vector2d(-12, -10), Math.toRadians(-135)) // shoot second spike mark
+                .waitSeconds(0.4)
+                .setReversed(true)
+                .splineTo(new Vector2d(8, -25), Math.toRadians(0)) // prepare to open gate and intake
+                .setReversed(false)
+                .splineTo(new Vector2d(6, -50), Math.toRadians(-110), new VelConstraint() {
+                    @Override
+                    public double maxRobotVel(@NonNull Pose2dDual<Arclength> pose2dDual, @NonNull PosePath posePath, double v) {
+                        return 60;
+                    }
+                }) // open gate and intake
+                .afterTime(0, new IntakeOn())
+                .waitSeconds(1)
+                .strafeTo(new Vector2d(20, -54)) // shuffle around a bit to try to intake more
+                .waitSeconds(1)
+                .afterTime(0, new IntakeOff())
+                .afterTime(0.8, new SpinUpFlywheelMedium())
+                //.strafeToLinearHeading(new Vector2d(12, 20), Math.toRadians(90)) // prepare to shoot gate
+                .strafeTo(new Vector2d(20, -20))
+                .afterTime(1.6, new ShootClose())
+                .strafeToLinearHeading(new Vector2d(-10, -10), Math.toRadians(-135)) // shoot gate
+                .waitSeconds(1.5)
+                //.strafeToLinearHeading(new Vector2d(-11, 20), Math.toRadians(105)) // prepare to intake first spike mark
+                .afterTime(0, new IntakeOn())
+                .strafeToLinearHeading(new Vector2d(-11, -38), Math.toRadians(-90)) // intake first spike mark
+                .afterTime(0, new IntakeOff())
+                .afterTime(0.5, new SpinUpFlywheelClose())
+                .afterTime(1.0, new ShootClose())
+                .strafeToLinearHeading(new Vector2d(-34, -26), Math.toRadians(-125)) // shoot first spike mark
+                .waitSeconds(0.4)
+                .setReversed(true)
+                .strafeToLinearHeading(new Vector2d(34, -5), Math.toRadians(-90)) // prepare to intake third spike mark
+                .afterTime(0, new IntakeOn())
+                .setReversed(false)
+                .splineTo(new Vector2d(34, -36), Math.toRadians(-90), new VelConstraint() {
+                    @Override
+                    public double maxRobotVel(@NonNull Pose2dDual<Arclength> pose2dDual, @NonNull PosePath posePath, double v) {
+                        return 100;
+                    }
+                }) // intake third spike mark
+                .afterTime(0, new IntakeOff())
+                .setReversed(false)
+                .strafeToLinearHeading(new Vector2d(5, -15), Math.toRadians(-90)) // prepare to shoot third spike mark
+                .afterTime(0.5, new SpinUpFlywheelMedium())
+                .afterTime(1.25, new ShootClose())
+                .strafeToLinearHeading(new Vector2d(-12, -10), Math.toRadians(-135)) // shoot third spike mark
+                .waitSeconds(1.0)
+                .strafeTo(new Vector2d(7, -10)); // park
 
         waitForStart();
         while(opModeIsActive()) {
