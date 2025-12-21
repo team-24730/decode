@@ -1,6 +1,7 @@
 package com.example.meepmeeptesting;
 
 import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.Rotation2d;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.noahbres.meepmeep.MeepMeep;
 import com.noahbres.meepmeep.roadrunner.DefaultBotBuilder;
@@ -15,7 +16,42 @@ public class MeepMeepTesting {
                 .setConstraints(60, 60, Math.toRadians(180), Math.toRadians(180), 13.9145755) // default: 60, 60, 180, 180, 15
                 .build();
 
-        /* 15 ARTIFACT AUTO TESTING */
+        myBot.runAction(myBot.getDrive().actionBuilder(new Pose2d(-52, -46, Math.toRadians(235)))
+                        .strafeTo(new Vector2d(-38, -26)) // drive to preload shooting position
+                        .waitSeconds(1) // shoot preloads
+                        //.setTangent(0)
+                                .splineTo(new Vector2d(12, -50), Math.toRadians(270))
+                                .splineTo(new Vector2d(12, -50), Math.toRadians(270))
+                        //.splineToLinearHeading(new Pose2d(6, -25, Math.toRadians(260)), Math.toRadians(0)) // get ready to intake at second spike mark
+                        //.splineToLinearHeading(new Pose2d(12, -50, Math.toRadians(270)), Math.toRadians(270)) // drive to intake position of second spike mark
+                        .setReversed(true)
+                        .splineTo(new Vector2d(-16, -12), Math.toRadians(90)) // drive to second spike mark shooting position
+                        .strafeToLinearHeading(new Vector2d(-34, -26), Math.toRadians(235)) // shoot second spike mark
+                        .waitSeconds(1)
+                        .setReversed(true)
+                        .splineTo(new Vector2d(24, -14), Math.toRadians(25)) // prepare to open gate and intake
+                        .setReversed(false)
+                        .splineTo(new Vector2d(10, -58), Math.toRadians(240)) // open gate and intake
+                        .waitSeconds(2)
+                        .setReversed(true)
+                        .splineTo(new Vector2d(12, -26), Math.toRadians(90)) // prepare to shoot gate
+                        .strafeToLinearHeading(new Vector2d(-34, -26), Math.toRadians(235)) // shoot gate
+                        .waitSeconds(1)
+                        .strafeToLinearHeading(new Vector2d(-12, -28), Math.toRadians(255)) // prepare to intake first spike mark
+                        .strafeToLinearHeading(new Vector2d(-12, -50), Math.toRadians(270)) // intake first spike mark
+                        .strafeToLinearHeading(new Vector2d(-34, -26), Math.toRadians(235)) // shoot first spike mark
+                        .waitSeconds(1)
+                        .setReversed(true)
+                        .splineTo(new Vector2d(50, -20), Math.toRadians(0)) // prepare to intake third spike mark
+                        .setReversed(false)
+                        .splineTo(new Vector2d(36, -50), Math.toRadians(270)) // intake third spike mark
+                        .setReversed(true)
+                        .splineTo(new Vector2d(-15, -15), Math.toRadians(135)) // prepare to shoot third spike mark
+                        .strafeToLinearHeading(new Vector2d(-34, -26), Math.toRadians(235)) // shoot third spike mark
+                        .waitSeconds(1)
+                .build());
+
+        /* 15 ARTIFACT AUTO TESTING
         myBot.runAction(myBot.getDrive().actionBuilder(new Pose2d(-52, -46, Math.toRadians(235)))
                 .setReversed(true)
                 .splineTo(new Vector2d(-30, -16), Math.toRadians(55)) // drive to shooting position for preloads
@@ -48,7 +84,7 @@ public class MeepMeepTesting {
                 .setReversed(true)
                 .splineTo(new Vector2d(54, -14), Math.toRadians(25)) // go to far shoot position
                 .waitSeconds(1) // shoot fifth time (hp zone)
-                .build());
+                .build()); */
 
         /* ORIGINAL 9+3 ARTIFACT AUTO */
         /* myBot.runAction(myBot.getDrive().actionBuilder(new Pose2d(-56, -34, Math.toRadians(232.2)))
