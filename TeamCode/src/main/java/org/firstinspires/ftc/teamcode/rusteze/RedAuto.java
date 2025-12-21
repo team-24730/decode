@@ -21,6 +21,8 @@ public class RedAuto extends LinearOpMode {
 
     public void runOpMode() {
 
+        RobotConstants.teamColor = RobotConstants.Color.RED;
+
         Robot robot = new Robot(hardwareMap);
         ElapsedTime elapsedTime = new ElapsedTime(ElapsedTime.Resolution.MILLISECONDS);
 
