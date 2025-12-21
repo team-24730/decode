@@ -8,6 +8,11 @@ public class RobotConstants {
     public static double K_V = 0.0002;
     public static double K_P = 0.001;
     public static double TARGET_HOOD = 0.25;
+    public enum Color {
+        RED,
+        BLUE
+    }
+    public static Color teamColor = Color.RED;
 
     public int getTargetRpm() {
         return TARGET_RPM;
