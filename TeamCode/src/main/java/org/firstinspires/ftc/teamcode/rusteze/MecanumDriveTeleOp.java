@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.rusteze;
 
 import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -9,12 +10,17 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 import org.firstinspires.ftc.robotcore.internal.camera.calibration.PlaceholderCalibratedAspectRatioMismatch;
 
+import java.util.List;
+
 
 @TeleOp(name="MecanumDriveTeleOp")
 public class MecanumDriveTeleOp extends LinearOpMode {
     private final ElapsedTime runtime = new ElapsedTime();
     double outtakeTarget = 0.0;
     boolean intakeToggle = false;
+    RobotConstants constants = new RobotConstants();
+    RobotConstants.Color teamColor = constants.teamColor;
+    int currentID = 24;
 
     private Limelight3A limelight;
     private double lastTx = 0;
@@ -49,18 +55,21 @@ public class MecanumDriveTeleOp extends LinearOpMode {
                     robot.setState(Robot.State.IDLE);
                 }
                 if (gamepad1.xWasPressed()) {
+                    robot.setTransferSpeed(1);
                     robot.setState(Robot.State.OUTTAKE_IDLE);
-                    robot.setOuttakeTarget(3000);
+                    robot.setOuttakeTarget(3200);
                     robot.outtake.setHood(0.97);
                 }
                 if (gamepad1.yWasPressed()) {
+                    robot.setTransferSpeed(1);
                     robot.setState(Robot.State.OUTTAKE_IDLE);
-                    robot.setOuttakeTarget(4100);
+                    robot.setOuttakeTarget(3800);
                     robot.outtake.setHood(0.3);
                 }
                 if (gamepad1.bWasPressed()) {
+                    robot.setTransferSpeed(0.8);
                     robot.setState(Robot.State.OUTTAKE_IDLE);
-                    robot.setOuttakeTarget(4750);
+                    robot.setOuttakeTarget(4700);
                     robot.outtake.setHood(0.25);
                 }
             }
@@ -78,25 +87,42 @@ public class MecanumDriveTeleOp extends LinearOpMode {
                 LLResult result = limelight.getLatestResult();
                 if (result != null) {
                     if (result.isValid()) {
-                        double k = 0.02;
 
-                        Pose3D botpose = result.getBotpose();
-                        telemetry.addData("tx", result.getTx());
-                        lowPassYaw = Math.abs(result.getBotpose().getOrientation().getYaw()) * k     +     (1 - k) * lowPassYaw;
-                        lastTx = result.getTx() + (lowPassYaw - 90)/90 * 11 - 5;
-                        telemetry.addData("Angle Adjustment", (lowPassYaw - 90)/90 * 11 - 5);
-                        telemetry.addData("Low pass yaw", lowPassYaw);
-                        telemetry.addData("ty", result.getTy());
-                        telemetry.addData("Botpose", botpose.toString());
+                        double k = 0.02;
+                        if (lowPassYaw == 0) {
+                            lowPassYaw = Math.abs(result.getBotpose().getOrientation().getYaw());
+                        } else {
+                            lowPassYaw = Math.abs(result.getBotpose().getOrientation().getYaw()) * k   +  (1 - k) * lowPassYaw;
+                        }
+
+                        List<LLResultTypes.FiducialResult> fiducials = result.getFiducialResults();
+                        for (LLResultTypes.FiducialResult fiducial : fiducials) {
+                            currentID = fiducial.getFiducialId();
+                        }
+                        telemetry.addData("Current ID", currentID);
+
+                        telemetry.addData("Low Pass Yaw", lowPassYaw);
+
+
+                        if (currentID == 24 && teamColor == RobotConstants.Color.RED) {
+                            lastTx = result.getTx() + ((lowPassYaw - 90)/90 - 0.5) * -4;
+                            telemetry.addData("Angle Adjustment", ((lowPassYaw - 90)/90 - 0.5) * -4);
+                        }
+
+                        if (currentID == 20 && teamColor == RobotConstants.Color.BLUE) {
+                            lastTx = result.getTx() + ((lowPassYaw - 90)/90 - 0.5) * -4;
+                            telemetry.addData("Angle Adjustment", ((lowPassYaw - 90)/90 - 0.5) * -4);
+                        }
+
                     } else {
                         telemetry.addLine("Invalid result");
                         lastTx = 0;
-                        lowPassYaw = 135;
+                        lowPassYaw = 0;
                     }
                 } else {
                     telemetry.addLine("Null result");
                     lastTx = 0;
-                    lowPassYaw = 135;
+                    lowPassYaw = 0;
                 }
 
                 robot.setDrivetrainTarget(-gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x + limelight_PIDF.calculate(lastTx), gamepad1.right_bumper);
@@ -109,6 +135,7 @@ public class MecanumDriveTeleOp extends LinearOpMode {
 
             robot.update();
 
+            telemetry.addData("Current Color", RobotConstants.teamColor);
             telemetry.addData("TargetRPM", robot.outtake.targetRPM);
             telemetry.addData("Servo Pos", servoDebug);
             telemetry.addData("Current State", robot.getState());
