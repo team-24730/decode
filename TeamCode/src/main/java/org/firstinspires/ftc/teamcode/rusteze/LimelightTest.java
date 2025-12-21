@@ -2,13 +2,14 @@ package org.firstinspires.ftc.teamcode.rusteze;
 
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 
-
+@Disabled
 @TeleOp(name="Limelight Test")
 public class LimelightTest extends LinearOpMode {
     private ElapsedTime runtime = new ElapsedTime();
