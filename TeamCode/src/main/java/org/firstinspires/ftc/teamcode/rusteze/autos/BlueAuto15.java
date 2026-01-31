@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.rusteze;
+package org.firstinspires.ftc.teamcode.rusteze.autos;
 
 import androidx.annotation.NonNull;
 
@@ -10,12 +10,16 @@ import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.MecanumDrive;
+import org.firstinspires.ftc.teamcode.rusteze.Robot;
+import org.firstinspires.ftc.teamcode.rusteze.RobotConstants;
 
 @Autonomous(name="15 Artifact Blue Auto")
+@Disabled
 public class BlueAuto15 extends LinearOpMode {
 
 

@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.rusteze;
+package org.firstinspires.ftc.teamcode.rusteze.autos;
 
 import androidx.annotation.NonNull;
 
@@ -14,8 +14,10 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.MecanumDrive;
+import org.firstinspires.ftc.teamcode.rusteze.Robot;
+import org.firstinspires.ftc.teamcode.rusteze.RobotConstants;
 
-@Autonomous(name="Red Auto")
+@Autonomous(name="Red Auto 12", group="not main")
 public class RedAuto extends LinearOpMode {
 
 
