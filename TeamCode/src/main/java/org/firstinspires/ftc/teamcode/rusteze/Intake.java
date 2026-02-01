@@ -33,38 +33,37 @@ public class Intake {
 
     public void enable() {
         state = State.INTAKE;
-        intake.setPower(1);
         disengageClutch();
+        intake.setPower(0);
+        timestamp = System.currentTimeMillis(); // delay intaking
     }
 
     public void enableTransfer() {
         intake.setPower(1);
+        engageClutch();
         state = State.TRANSFER;
     }
 
     public void disable() {
-        if (state == State.INTAKE) {
-            state = State.REENGAGING;
-            intake.setPower(0.1);
-            engageClutch();
-            timestamp = System.currentTimeMillis();
-        } else if (state == State.TRANSFER) {
-            intake.setPower(0);
-            state = State.IDLE;
-        } else {
-            state = State.IDLE;
-            intake.setPower(0);
-        }
+        intake.setPower(0);
+        state = State.IDLE;
     }
 
-    public void engageClutch() { clutch.setPosition(1); }
+    public void engageClutch() { clutch.setPosition(0.6); }
 
-    public void disengageClutch () { clutch.setPosition(0); }
+    public void disengageClutch () { clutch.setPosition(0.8); }
 
     public void update() {
-        if (state == State.REENGAGING && System.currentTimeMillis() - timestamp > 500) {
+        /*if (state == State.REENGAGING && System.currentTimeMillis() - timestamp > 250) { // reengage after a delay
+            engageClutch();
+        }
+        if (state == State.REENGAGING && System.currentTimeMillis() - timestamp > 1000) { // allow one second and a half for the clutch to reengage
             intake.setPower(0);
             state = State.IDLE;
+        } */
+
+        if (state == State.INTAKE && System.currentTimeMillis() - timestamp > 150) { // allow some time for disengagement before intaking
+            intake.setPower(1);
         }
     }
 }
