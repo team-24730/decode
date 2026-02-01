@@ -12,11 +12,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 public class TemplateOpMode extends LinearOpMode {
     private ElapsedTime runtime = new ElapsedTime();
 
-
-
     @Override
     public void runOpMode() {
-
 
 
         waitForStart();
