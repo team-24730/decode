@@ -7,13 +7,15 @@ public class Robot {
     public Intake intake;
     public Transfer transfer;
     public Outtake outtake;
+    public Lift lift;
 
     public enum State {
         IDLE,
         INTAKE,
         INTAKE_REVERSE,
         OUTTAKE_IDLE,
-        OUTTAKE_SHOOT
+        OUTTAKE_SHOOT,
+        LIFT
     }
     State robotState = State.IDLE;
 
@@ -36,6 +38,7 @@ public class Robot {
         intake = new Intake(hwMap);
         transfer = new Transfer(hwMap);
         outtake = new Outtake(hwMap);
+        lift = new Lift(hwMap);
     }
 
     public void setOuttakeTarget(double targetRPM) {
@@ -108,7 +111,6 @@ public class Robot {
                 transfer.setPower(-0.5);
                 setOuttakeRawPower(-0.35);
 
-
                 // Exit condition
                 if (System.currentTimeMillis() - lastIntakeTime > 500) {
                     setState(State.IDLE);
@@ -122,6 +124,7 @@ public class Robot {
                 }
                 transfer.setPower(0);
                 intake.setPower(0);
+
                 break;
 
             case OUTTAKE_SHOOT:
@@ -130,14 +133,23 @@ public class Robot {
                 }
                 transfer.setPower(transferSpeed);
                 intake.setPower(1);
+
                 break;
 
+            case LIFT:
+                if(drivetrainEnabled) {
+                    drivetrain.setMotorPowers(drivetrainAxial, drivetrainLateral, drivetrainRotation, !drivetrainSlowEnabled);
+                }
+                transfer.setPower(0);
+                intake.setPower(0);
+                break;
 
             default:
                 robotState = State.IDLE;
         }
 
         outtake.update();
+        intake.update();
 
         /*
 
