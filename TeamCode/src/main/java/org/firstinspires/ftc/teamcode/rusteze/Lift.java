@@ -15,18 +15,18 @@ public class Lift {
     }
 
     public void retract() {
-        if (extended) {
-            leftLift.setPosition(0.15);
-            rightLift.setPosition(0.15);
+        //if (extended) {
+            leftLift.setPosition(0.2);
+            rightLift.setPosition(0.2);
             extended = false;
-        }
+        //}
     }
 
     public void extend() {
-        if (!extended) {
+        //if (!extended) {
             leftLift.setPosition(0.78);
             rightLift.setPosition(0.78);
             extended = true;
-        }
+        //}
     }
 }
