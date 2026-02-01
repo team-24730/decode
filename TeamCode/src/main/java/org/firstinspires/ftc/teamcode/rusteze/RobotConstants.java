@@ -4,10 +4,10 @@ import com.acmerobotics.dashboard.config.Config;
 
 @Config
 public class RobotConstants {
-    public static int TARGET_RPM = 0;
+    public static int TARGET_RPM = 3690;
     public static double K_V = 0.0002;
     public static double K_P = 0.001;
-    public static double TARGET_HOOD = 0.25;
+    public static double TARGET_HOOD = 0.4 ; // 0.25 - 0.97
     public enum Color {
         RED,
         BLUE
