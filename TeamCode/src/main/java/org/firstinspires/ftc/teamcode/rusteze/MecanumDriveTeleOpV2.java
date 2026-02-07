@@ -39,6 +39,16 @@ public class MecanumDriveTeleOpV2 extends LinearOpMode {
 
 
             // ARTIFACT INTAKING CODE //
+            if (gamepad1.backWasPressed() && robot.getState() == RobotV2.State.IDLE && robot.intake.getState() != Intake.State.INTAKE) {
+                robot.setState(RobotV2.State.INTAKE);
+                robot.intake.reverse();
+            } else if (gamepad1.backWasPressed() && robot.getState() == RobotV2.State.INTAKE && robot.intake.getState() != Intake.State.REVERSE) {
+                robot.intake.disable();
+                robot.setState(RobotV2.State.IDLE);
+            }
+
+
+
             if (gamepad1.leftBumperWasPressed() && (robot.getState() == RobotV2.State.IDLE || robot.getState() == RobotV2.State.INTAKE)) {
                 if (robot.intake.getState() == Intake.State.IDLE) {
                     robot.setState(RobotV2.State.INTAKE);
@@ -48,6 +58,8 @@ public class MecanumDriveTeleOpV2 extends LinearOpMode {
                     robot.intake.disable();
                 }
             }
+
+
 
             // ARTIFACT TRANSFER SHOOTING CODE //
             if (robot.getState() == RobotV2.State.SHOOTING) {
@@ -62,26 +74,31 @@ public class MecanumDriveTeleOpV2 extends LinearOpMode {
             if (robot.getState() == RobotV2.State.IDLE || robot.getState() == RobotV2.State.SHOOTING) {
                 if (gamepad1.aWasPressed()) {
                     robot.setState(RobotV2.State.IDLE);
+                    robot.intake.disable();
                 }
                 if (gamepad1.xWasPressed()) {
                     robot.setState(RobotV2.State.SHOOTING);
-                    robot.outtake.setTarget(1500); //3200
+                    robot.outtake.setTarget(2800); //3200
                     robot.outtake.setHood(0.97);
+                    robot.outtake.useControlSystem = true;
                 }
                 if (gamepad1.yWasPressed()) {
                     robot.setState(RobotV2.State.SHOOTING);
-                    robot.outtake.setTarget(4000);
-                    robot.outtake.setHood(0.4);
+                    robot.outtake.setTarget(3800);
+                    robot.outtake.setHood(0.25);
+                    robot.outtake.useControlSystem = true;
                 }
                 if (gamepad1.bWasPressed()) {
                     robot.setState(RobotV2.State.SHOOTING);
-                    robot.outtake.setTarget(4900);
+                    robot.outtake.setTarget(4400);
                     robot.outtake.setHood(0.25);
+                    robot.outtake.useControlSystem = true;
                 }
             }
 
             if (robot.getState() == RobotV2.State.IDLE) {
-                robot.outtake.setTarget(0);
+                robot.outtake.setPower(0);
+                robot.outtake.useControlSystem = false;
             }
 
             if (robot.getState() == RobotV2.State.SHOOTING) {
@@ -160,20 +177,48 @@ public class MecanumDriveTeleOpV2 extends LinearOpMode {
                 robot.lift.extend();
             }
 
-
-
+            // LIFT CODE
             if (robot.getState() == RobotV2.State.LIFT) {
                 telemetry.addLine("CURRENTLY LIFTING -- Press Left Bumper, Right Bumper, and Start to unlift");
             }
 
+
+            // TURRET CODE
+            if (gamepad1.right_bumper && gamepad1.right_trigger > 0.2) {
+                robot.turret.initializeTurret();
+            }
+
+            if (gamepad1.dpad_up) {
+                robot.turret.setTargetPosition(360);
+            }
+            if (gamepad1.dpad_down) {
+                robot.turret.setTargetPosition(10);
+            }
+            if (gamepad1.dpad_left) {
+                robot.turret.setTargetPosition(180);
+            }
+            if (gamepad1.dpad_right) {
+                robot.turret.setTargetPosition(0);
+            }
+
             robot.update();
 
-            telemetry.addData("Lift pos", robot.lift.leftLift.getPosition());
             telemetry.addData("Current Color", RobotConstants.teamColor);
-            telemetry.addData("TargetRPM", robot.outtake.targetRPM);
             telemetry.addData("Current State", robot.getState());
+
+            telemetry.addLine("------------------------------\nDEBUG INFORMATION:\n");
+
             telemetry.addData("Current Intake State", robot.intake.getState());
+            telemetry.addData("TargetRPM", robot.outtake.targetRPM);
+            telemetry.addData("Lift Position", robot.lift.leftLift.getPosition());
+            telemetry.addData("Flywheel Velocity", robot.outtake.currentRPM);
+            telemetry.addData("Current Turret Position", robot.turret.getPosition());
+            telemetry.addData("Targeted Turret Position", robot.turret.getTargetPosition());
+            telemetry.addData("Turret Initialized", RobotConstants.turretInitialized);
             telemetry.update();
         }
     }
+
+    // Save turret position to file so it can be reused
+
 }
