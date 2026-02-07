@@ -4,10 +4,14 @@ import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.Arclength;
 import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.Pose2dDual;
+import com.acmerobotics.roadrunner.PosePath;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
 import com.acmerobotics.roadrunner.Vector2d;
+import com.acmerobotics.roadrunner.VelConstraint;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -58,7 +62,7 @@ public class V2RobotRedClose extends LinearOpMode {
                 if (!initialized) {
                     robot.outtake.useControlSystem = true;
                     robot.outtake.setTarget(3300);
-                    robot.outtake.setHood(0.35);
+                    robot.outtake.setHood(0.4);
                     initialized = true;
                     elapsedTime.reset();
                 }
@@ -105,17 +109,20 @@ public class V2RobotRedClose extends LinearOpMode {
             public boolean run(@NonNull TelemetryPacket packet) {
                 if (!initialized) {
                     robot.intake.enableTransfer();
+                    initialized = true;
                     elapsedTime.reset();
                 }
 
                 packet.put("Elapsed Time", elapsedTime.time());
-                if (elapsedTime.time() < 1500) {
+                if (elapsedTime.time() < 2000) {
                     robot.update(); // update the robot so the PID continues working and transfer works
-                    if (elapsedTime.time() > 1250) { robot.outtake.setTarget(0); }
+                    if (elapsedTime.time() > 1500) { robot.outtake.setTarget(0); }
                     return true;
                 } else {
+                    robot.outtake.useControlSystem = false;
                     robot.intake.disable();
                     robot.outtake.setTarget(0);
+                    robot.outtake.setPower(0);
                     robot.update();
                     return false;
                 }
@@ -130,6 +137,7 @@ public class V2RobotRedClose extends LinearOpMode {
                 if (!initialized) {
                     robot.setState(RobotV2.State.INTAKE);
                     robot.intake.enable();
+                    initialized = true;
                     elapsedTime.reset();
                 }
 
@@ -150,6 +158,7 @@ public class V2RobotRedClose extends LinearOpMode {
             public boolean run(@NonNull TelemetryPacket packet) {
                 if (!initialized) {
                     robot.intake.disable();
+                    initialized = true;
                     elapsedTime.reset();
                 }
 
@@ -172,38 +181,54 @@ public class V2RobotRedClose extends LinearOpMode {
                 .afterTime(0, new SpinUpFlywheelMedium())
                 .afterTime(1.4, new Shoot())
                 .strafeToLinearHeading(new Vector2d(-24, 4), Math.toRadians(135)) // shoot preload
-                .waitSeconds(3.0) // see if time can be saved
+                .waitSeconds(2.0) // see if time can be saved
 
                 /* First Spike */
-                .afterTime(0.3, new IntakeOn())
-                .splineTo(new Vector2d(-13, 50), Math.toRadians(90))
-                .afterTime(0.0, new IntakeOff())
-                .waitSeconds(0.2)
+                .afterTime(0.1, new IntakeOn())
+                .splineTo(new Vector2d(-13, 50), Math.toRadians(90), new VelConstraint() {
+                    @Override
+                    public double maxRobotVel(@NonNull Pose2dDual<Arclength> pose2dDual, @NonNull PosePath posePath, double v) {
+                        return 40;
+                    }
+                })
+                .afterTime(0.5, new IntakeOff())
+                .waitSeconds(0.4)
                 .afterTime(0.71, new SpinUpFlywheelMedium())
-                .afterTime(1.3, new Shoot())
-                .strafeToLinearHeading(new Vector2d(-22, 4), Math.toRadians(135))
-                .waitSeconds(0.6)
+                .afterTime(1.5, new Shoot())
+                .strafeToLinearHeading(new Vector2d(-22, 4), Math.toRadians(138))
+                .waitSeconds(1.5)
 
                 /* Second Spike */
                 .strafeToLinearHeading(new Vector2d(6, 6), Math.toRadians(90))
                 .afterTime(0.0, new IntakeOn())
-                .strafeToLinearHeading(new Vector2d(6, 44), Math.toRadians(90))
-                .afterTime(0.5, new IntakeOff())
+                .strafeToLinearHeading(new Vector2d(12, 60), Math.toRadians(90), new VelConstraint() {
+                    @Override
+                    public double maxRobotVel(@NonNull Pose2dDual<Arclength> pose2dDual, @NonNull PosePath posePath, double v) {
+                        return 40;
+                    }
+                })
+                .afterTime(1.0, new IntakeOff())
                 .strafeToLinearHeading(new Vector2d(-2, 60), Math.toRadians(0)) // open gate
+                .waitSeconds(0.5)
                 .afterTime(0.9, new SpinUpFlywheelMedium())
                 .afterTime(1.9, new Shoot())
-                .strafeToLinearHeading(new Vector2d(-20, 4), Math.toRadians(140))
-                .waitSeconds(0.75)
+                .strafeToLinearHeading(new Vector2d(-24, 4), Math.toRadians(137))
+                .waitSeconds(2.0)
 
                 /* Third Spike */
                 .strafeToLinearHeading(new Vector2d(30, 12), Math.toRadians(90))
                 .afterTime(0, new IntakeOn())
-                .strafeToLinearHeading(new Vector2d(30, 44), Math.toRadians(90))
-                .afterTime(0, new IntakeOff())
+                .strafeToLinearHeading(new Vector2d(30, 60), Math.toRadians(90), new VelConstraint() {
+                    @Override
+                    public double maxRobotVel(@NonNull Pose2dDual<Arclength> pose2dDual, @NonNull PosePath posePath, double v) {
+                        return 30;
+                    }
+                })
+                .afterTime(1.5, new IntakeOff())
                 .afterTime(0.7, new SpinUpFlywheelMedium())
                 .afterTime(1.5, new Shoot())
-                .strafeToLinearHeading(new Vector2d(-22, 6), Math.toRadians(137))
-                .waitSeconds(0.6)
+                .strafeToLinearHeading(new Vector2d(-26, 8), Math.toRadians(135))
+                .waitSeconds(2.0)
 
                 /* Park */
                 .strafeToLinearHeading(new Vector2d(-5, 16), Math.toRadians(90))
@@ -215,6 +240,8 @@ public class V2RobotRedClose extends LinearOpMode {
         waitForStart();
         while(opModeIsActive()) {
 
+            robot.turret.initializeTurret();
+            robot.turret.setTargetPosition(0);
 
             Actions.runBlocking(
                     new SequentialAction(
