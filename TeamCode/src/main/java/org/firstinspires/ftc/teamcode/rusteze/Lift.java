@@ -16,8 +16,8 @@ public class Lift {
 
     public void retract() {
         //if (extended) {
-            leftLift.setPosition(0.2);
-            rightLift.setPosition(0.2);
+            leftLift.setPosition(0.15);
+            rightLift.setPosition(0.15);
             extended = false;
         //}
     }
