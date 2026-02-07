@@ -11,8 +11,10 @@ public class Outtake {
     private DcMotorEx flywheelBottom;
     private Servo hood;
 
+    public double currentRPM = 0;
+
     double targetRPM = 0;
-    boolean useControlSystem = true;
+    public boolean useControlSystem = true;
     private double rawPower = 0;
 
     private final int TICKS_PER_REVOLUTION = 28;
@@ -49,15 +51,15 @@ public class Outtake {
         double flywheelPower;
         if (useControlSystem) {
             // Calculate control system variables
-            double currentRPM = flywheelBottom.getVelocity() / TICKS_PER_REVOLUTION * 60; // Convert ticks per second to revolutions per minute
+            currentRPM = flywheelBottom.getVelocity() / TICKS_PER_REVOLUTION * 60;                                  // Convert ticks per second to revolutions per minute
             double errorRPM = targetRPM - currentRPM;
             double kV = constants.getkV();
             double kP = constants.getkP();
 
-            double vComponent = targetRPM * kV; // Calculate feedforward (SVA) V component
-            double pComponent = errorRPM * kP; // Calculate feedback (PID) P component
+            double vComponent = targetRPM * kV;                                                                         // Calculate feedforward (SVA) V component
+            double pComponent = errorRPM * kP;                                                                          // Calculate feedback (PID) P component
 
-            flywheelPower = Math.min(1, Math.max(vComponent + pComponent, 0)); // Calculate and clamp flywheel power between 0 and 1
+            flywheelPower = Math.min(1, Math.max(vComponent + pComponent, 0));                                          // Calculate and clamp flywheel power between 0 and 1
         } else {
             flywheelPower = rawPower;
         }
