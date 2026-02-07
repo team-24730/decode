@@ -189,13 +189,13 @@ public class MecanumDriveTeleOpV2 extends LinearOpMode {
             }
 
             if (gamepad1.dpad_up) {
-                robot.turret.setTargetPosition(360);
+                robot.turret.setTargetPosition(359);
             }
             if (gamepad1.dpad_down) {
                 robot.turret.setTargetPosition(10);
             }
             if (gamepad1.dpad_left) {
-                robot.turret.setTargetPosition(180);
+                robot.turret.setTargetPosition(-10);
             }
             if (gamepad1.dpad_right) {
                 robot.turret.setTargetPosition(0);
