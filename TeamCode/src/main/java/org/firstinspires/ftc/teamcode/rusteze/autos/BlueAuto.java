@@ -18,6 +18,7 @@ import org.firstinspires.ftc.teamcode.MecanumDrive;
 import org.firstinspires.ftc.teamcode.rusteze.Robot;
 import org.firstinspires.ftc.teamcode.rusteze.RobotConstants;
 
+@Disabled
 @Autonomous(name="Blue Auto 12", group="not main")
 public class BlueAuto extends LinearOpMode {
 
