@@ -7,6 +7,7 @@ public class RobotV2 {
     public Intake intake;
     public Outtake outtake;
     public Lift lift;
+    public Turret turret;
 
     public enum State {
         IDLE,
@@ -21,6 +22,7 @@ public class RobotV2 {
         intake = new Intake(hwMap);
         outtake = new Outtake(hwMap);
         lift = new Lift(hwMap);
+        turret = new Turret(hwMap);
     }
 
     public State getState() {
@@ -32,8 +34,8 @@ public class RobotV2 {
     }
 
     public void update() {
-
         intake.update();
         outtake.update();
+        turret.update();
     }
 }
