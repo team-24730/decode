@@ -25,7 +25,7 @@ public class Turret {
     }
 
     public double getTargetPosition() {
-        return turret.getCurrentPosition();
+        return targetPosition;
     }
 
     public void initializeTurret() {
@@ -36,15 +36,17 @@ public class Turret {
     }
 
     public void setTargetPosition(double targetPosition) {
-        double negativeOverflow = targetPosition - 360;
-        double positiveOverflow = targetPosition + 360;
+        double moduloTargetPosition = targetPosition % 360;
 
-        if (positiveOverflow - getPosition() < targetPosition - getPosition() && positiveOverflow < 370) {
+        double negativeOverflow = moduloTargetPosition - 360;
+        double positiveOverflow = moduloTargetPosition + 360;
+
+        if (positiveOverflow - getPosition() < moduloTargetPosition - getPosition() && positiveOverflow < 370) {
             this.targetPosition = positiveOverflow;
-        } else if (negativeOverflow - getPosition() < targetPosition - getPosition() && negativeOverflow > -10) {
+        } else if (negativeOverflow - getPosition() < moduloTargetPosition - getPosition() && negativeOverflow > -10) {
             this.targetPosition = negativeOverflow;
         } else {
-            this.targetPosition = targetPosition;
+            this.targetPosition = moduloTargetPosition;
         }
     }
 
