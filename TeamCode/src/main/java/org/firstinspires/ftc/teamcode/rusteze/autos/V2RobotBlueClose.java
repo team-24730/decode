@@ -19,7 +19,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.MecanumDrive;
 import org.firstinspires.ftc.teamcode.rusteze.RobotConstants;
-import org.firstinspires.ftc.teamcode.rusteze.RobotV2;
+import org.firstinspires.ftc.teamcode.rusteze.subsystems.RobotV2;
 
 @Autonomous(name="Blue Close Main", group="main")
 public class V2RobotBlueClose extends LinearOpMode {
@@ -62,7 +62,7 @@ public class V2RobotBlueClose extends LinearOpMode {
                 if (!initialized) {
                     robot.outtake.useControlSystem = true;
                     robot.outtake.setTarget(3300);
-                    robot.outtake.setHood(0.4);
+                    robot.outtake.setHood(0.6);
                     initialized = true;
                     elapsedTime.reset();
                 }
@@ -226,7 +226,7 @@ public class V2RobotBlueClose extends LinearOpMode {
                 })
                 .afterTime(1.3, new IntakeOff())
                 .afterTime(0.7, new SpinUpFlywheelMedium())
-                .afterTime(1.5, new Shoot())
+                .afterTime(1.7, new Shoot())
                 .strafeToLinearHeading(new Vector2d(-26, -8), Math.toRadians(-135))
                 .waitSeconds(2.0)
 

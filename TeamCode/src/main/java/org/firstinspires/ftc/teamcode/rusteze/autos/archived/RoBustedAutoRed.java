@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.rusteze.autos;
+package org.firstinspires.ftc.teamcode.rusteze.autos.archived;
 
 import androidx.annotation.NonNull;
 
@@ -15,12 +15,14 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.MecanumDrive;
-import org.firstinspires.ftc.teamcode.rusteze.Robot;
+import org.firstinspires.ftc.teamcode.rusteze.subsystems.Robot;
 import org.firstinspires.ftc.teamcode.rusteze.RobotConstants;
 
 @Disabled
-@Autonomous(name="Blue Buddy Far FHF3FHFHF", group="main")
-public class BlueBuddyFarFHF3FHFHF extends LinearOpMode {
+@Autonomous(name="RoBusted Auto Red", group="not main")
+public class RoBustedAutoRed extends LinearOpMode {
+
+
 
     public void runOpMode() {
 
@@ -80,7 +82,7 @@ public class BlueBuddyFarFHF3FHFHF extends LinearOpMode {
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
                 if (!initialized) {
-                    robot.setOuttakeTarget(4700);
+                    robot.setOuttakeTarget(4650);
                     robot.outtake.setHood(0.25);
                     robot.outtake.update();
                     initialized = true;
@@ -88,7 +90,7 @@ public class BlueBuddyFarFHF3FHFHF extends LinearOpMode {
                 }
                 packet.put("Elapsed Time", elapsedTime.time());
 
-                if (elapsedTime.time() < 2000) {
+                if (elapsedTime.time() < 1500) {
                     robot.outtake.update(); // allow the PID controller a second and a half to spin up the flywheel
                     return true;
                 } else {
@@ -153,7 +155,7 @@ public class BlueBuddyFarFHF3FHFHF extends LinearOpMode {
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
                 robot.intake.setPower(1);
-                robot.transfer.setPower(0.3);
+                robot.transfer.setPower(1);
                 packet.put("Intake Enabled", true);
                 return false;
             }
@@ -187,58 +189,48 @@ public class BlueBuddyFarFHF3FHFHF extends LinearOpMode {
         }
 
 
-        Pose2d initialPose = new Pose2d(60, -17, Math.toRadians(-180));
+        Pose2d initialPose = new Pose2d(65, 12, Math.toRadians(180));
         MecanumDrive drive = new MecanumDrive(hardwareMap, initialPose);
 
         TrajectoryActionBuilder shootPreload = drive.actionBuilder(initialPose)
-                /* Preloads */
                 .afterTime(0, new SpinUpFlywheelFar())
-                .afterTime(0.8, new ShootFar())
-                .strafeToLinearHeading(new Vector2d(55, -12), Math.toRadians(-155)) // shoot preload
-                .waitSeconds(1.0) // see if time can be saved
-
-                /* Initial HP Zone */
-                .afterTime(0.4, new IntakeOn())
-                .strafeToLinearHeading(new Vector2d(50, -70), Math.toRadians(-70)) // intake hp
-                .strafeToLinearHeading(new Vector2d(62, -80), Math.toRadians(-0)) // shift
-                .strafeToLinearHeading(new Vector2d(65, -80), Math.toRadians(-0)) // shift
+                .afterTime(1.55, new ShootFar())
+                .strafeToLinearHeading(new Vector2d(52, 12), Math.toRadians(156)) // initial shooting pose
+                .waitSeconds(1.9)
+                .strafeToLinearHeading(new Vector2d(26, 25), Math.toRadians(90)) // prepare to intake third spike mark
+                .afterTime(0, new IntakeOn())
+                .strafeToLinearHeading(new Vector2d(26, 60), Math.toRadians(90)) // intake third spike mark
                 .afterTime(0, new IntakeOff())
-                .afterTime(1.1, new SpinUpFlywheelFar())
-                .afterTime(2.1, new ShootFar())
-                .strafeToLinearHeading(new Vector2d(55, -12), Math.toRadians(-160)) // shoot hp
-                .waitSeconds(1.0) // see if time can be saved
-
-                /* Third Spike Mark */
-                .afterTime(0.3, new IntakeOn())
-                .splineTo(new Vector2d(30, -50), Math.toRadians(-90)) // intake third spike
+                .afterTime(0.55, new SpinUpFlywheelFar())
+                .afterTime(1.2, new ShootFar())
+                .strafeToLinearHeading(new Vector2d(52, 12), Math.toRadians(158)) // shoot third spike mark
+                .waitSeconds(1.7)
+                .afterTime(0.5, new IntakeOn())
+                .strafeToLinearHeading(new Vector2d(52, 69), Math.toRadians(90)) // intake hp
+                .strafeToLinearHeading(new Vector2d(58, 66), Math.toRadians(70)) // intake hp shift
                 .afterTime(0, new IntakeOff())
                 .afterTime(0.6, new SpinUpFlywheelFar())
-                .afterTime(1.2, new ShootFar()) // see if time can be saved
-                .strafeToLinearHeading(new Vector2d(55, -12), Math.toRadians(-160)) // shoot third spike
-                .waitSeconds(1.0)
+                .strafeToLinearHeading(new Vector2d(52, 12), Math.toRadians(157)) // shoot hp zone
+                .afterTime(0, new ShootFar())
+                .waitSeconds(2.5)
 
-                /* Second HP Intake */
-                .afterTime(0.4, new IntakeOn())
-                .strafeToLinearHeading(new Vector2d(50, -70), Math.toRadians(-70)) // intake hp
-                .strafeToLinearHeading(new Vector2d(62, -80), Math.toRadians(-0)) // shift
-                .strafeToLinearHeading(new Vector2d(65, -80), Math.toRadians(-0)) // shift
+                .afterTime(0, new IntakeOn())
+                .strafeToLinearHeading(new Vector2d(56, 68), Math.toRadians(90)) // intake hp
+                .strafeToLinearHeading(new Vector2d(58, 66), Math.toRadians(70)) // intake hp shift
                 .afterTime(0, new IntakeOff())
-                .afterTime(1.1, new SpinUpFlywheelFar())
-                .afterTime(1.9, new ShootFar())
-                .strafeToLinearHeading(new Vector2d(55, -12), Math.toRadians(-160)) // shoot hp
-                .waitSeconds(1.0) // see if time can be saved
+                .afterTime(0.6, new SpinUpFlywheelFar())
+                .strafeToLinearHeading(new Vector2d(52, 12), Math.toRadians(159)) // shoot hp zone
+                .afterTime(0.2, new ShootFar())
+                .waitSeconds(2.1)
 
-                /* Third HP Intake */
-                .afterTime(0.4, new IntakeOn())
-                .strafeToLinearHeading(new Vector2d(30, -70), Math.toRadians(-70)) // intake hp
-                .strafeToLinearHeading(new Vector2d(62, -80), Math.toRadians(-0)) // shift
-                .strafeToLinearHeading(new Vector2d(65, -80), Math.toRadians(-0)) // shift
+                .afterTime(0, new IntakeOn())
+                .strafeToLinearHeading(new Vector2d(56, 68), Math.toRadians(90)) // intake hp
+                .strafeToLinearHeading(new Vector2d(58, 66), Math.toRadians(70)) // intake hp shift
                 .afterTime(0, new IntakeOff())
-                .afterTime(1.1, new SpinUpFlywheelFar())
-                .afterTime(1.9, new ShootFar())
-                .strafeToLinearHeading(new Vector2d(55, -12), Math.toRadians(-160)) // shoot hp
-                .waitSeconds(0.8)
-                .strafeToLinearHeading(new Vector2d(40, -12), Math.toRadians(-160)) // park
+                .afterTime(0.6, new SpinUpFlywheelFar())
+                .strafeToLinearHeading(new Vector2d(52, 12), Math.toRadians(159)) // shoot hp zone
+                .afterTime(0.2, new ShootFar())
+                .waitSeconds(2.1)
 
                 ;
 

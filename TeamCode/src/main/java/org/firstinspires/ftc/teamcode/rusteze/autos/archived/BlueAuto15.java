@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.rusteze.autos;
+package org.firstinspires.ftc.teamcode.rusteze.autos.archived;
 
 import androidx.annotation.NonNull;
 
@@ -15,12 +15,13 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.MecanumDrive;
-import org.firstinspires.ftc.teamcode.rusteze.Robot;
+import org.firstinspires.ftc.teamcode.rusteze.subsystems.Robot;
 import org.firstinspires.ftc.teamcode.rusteze.RobotConstants;
 
+@Autonomous(name="15 Artifact Blue Auto")
 @Disabled
-@Autonomous(name="Blue Close M1GM2M3FHF", group="main")
-public class BlueCloseM1GM2M3FHF extends LinearOpMode {
+public class BlueAuto15 extends LinearOpMode {
+
 
     public void runOpMode() {
 
@@ -35,14 +36,14 @@ public class BlueCloseM1GM2M3FHF extends LinearOpMode {
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
                 if (!initialized) {
-                    robot.setOuttakeTarget(3350);
-                    robot.outtake.setHood(0.9);
+                    robot.setOuttakeTarget(3500);
+                    robot.outtake.setHood(0.65);
                     initialized = true;
                     elapsedTime.reset();
                 }
                 packet.put("Elapsed Time", elapsedTime.time());
 
-                if (elapsedTime.time() < 1000) {
+                if (elapsedTime.time() < 500) {
                     robot.outtake.update(); // allow the PID controller a second to spin up the flywheel
                     return true;
                 } else {
@@ -50,29 +51,6 @@ public class BlueCloseM1GM2M3FHF extends LinearOpMode {
                 }
             }
         }
-
-        class SpinUpFlywheelMedium implements Action {
-            boolean initialized = false;
-
-            @Override
-            public boolean run(@NonNull TelemetryPacket packet) {
-                if (!initialized) {
-                    robot.setOuttakeTarget(3900);
-                    robot.outtake.setHood(0.35);
-                    initialized = true;
-                    elapsedTime.reset();
-                }
-                packet.put("Elapsed Time", elapsedTime.time());
-
-                if (elapsedTime.time() < 1500) {
-                    robot.outtake.update(); // allow the PID controller a second to spin up the flywheel
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-        }
-
 
         class SpinUpFlywheelFar implements Action {
             boolean initialized = false;
@@ -80,7 +58,7 @@ public class BlueCloseM1GM2M3FHF extends LinearOpMode {
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
                 if (!initialized) {
-                    robot.setOuttakeTarget(4700);
+                    robot.setOuttakeTarget(4750);
                     robot.outtake.setHood(0.25);
                     robot.outtake.update();
                     initialized = true;
@@ -88,7 +66,7 @@ public class BlueCloseM1GM2M3FHF extends LinearOpMode {
                 }
                 packet.put("Elapsed Time", elapsedTime.time());
 
-                if (elapsedTime.time() < 2000) {
+                if (elapsedTime.time() < 1500) {
                     robot.outtake.update(); // allow the PID controller a second and a half to spin up the flywheel
                     return true;
                 } else {
@@ -130,13 +108,13 @@ public class BlueCloseM1GM2M3FHF extends LinearOpMode {
             public boolean run(@NonNull TelemetryPacket packet) {
                 if (!initialized) {
                     robot.intake.setPower(1);
-                    robot.transfer.setPower(0.65);
+                    robot.transfer.setPower(0.75);
                     initialized = true;
                     elapsedTime.reset();
                 }
 
                 packet.put("Elapsed Time", elapsedTime.time());
-                if (elapsedTime.time() < 1250) {
+                if (elapsedTime.time() < 1500) {
                     robot.outtake.update(); // continue updating the outtake so the PID controller can keep flywheel speed constant as artifacts move through the shooter
                     return true;
                 } else {
@@ -153,7 +131,7 @@ public class BlueCloseM1GM2M3FHF extends LinearOpMode {
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
                 robot.intake.setPower(1);
-                robot.transfer.setPower(0.7);
+                robot.transfer.setPower(1);
                 packet.put("Intake Enabled", true);
                 return false;
             }
@@ -187,65 +165,67 @@ public class BlueCloseM1GM2M3FHF extends LinearOpMode {
         }
 
 
-        Pose2d initialPose = new Pose2d(-56, -34, Math.toRadians(-127.8));
+        Pose2d initialPose = new Pose2d(-52, -46, Math.toRadians(235));
         MecanumDrive drive = new MecanumDrive(hardwareMap, initialPose);
 
         TrajectoryActionBuilder shootPreload = drive.actionBuilder(initialPose)
-                /* Preloads */
-                .afterTime(0, new SpinUpFlywheelMedium())
-                .afterTime(1.4, new ShootClose())
-                .strafeToLinearHeading(new Vector2d(-24, -0), Math.toRadians(-135)) // shoot preload
-                .waitSeconds(1.2) // see if time can be saved
+                .afterTime(0, new SpinUpFlywheelClose()) // spin up flywheel for close shooting
+                .setReversed(true)
+                .splineTo(new Vector2d(-26, -12), Math.toRadians(55)); // drive to shooting position for preloads
 
-                /* First Spike */
-                .afterTime(0.6, new IntakeOn())
-                .splineTo(new Vector2d(-8, -36), Math.toRadians(-90))
-                .afterTime(0.0, new IntakeOff())
-                .waitSeconds(0.4)
-                .afterTime(0.71, new SpinUpFlywheelMedium())
-                .afterTime(1.3, new ShootClose())
-                .strafeToLinearHeading(new Vector2d(-22, -4), Math.toRadians(-135))
-                .waitSeconds(0.6)
+        TrajectoryActionBuilder intakeFirstSpike = shootPreload.endTrajectory().fresh()
+                .setReversed(false)
+                .splineTo(new Vector2d(-8, -40), Math.toRadians(270)); // intake at first spike mark
 
-                /* Second Spike */
-                .strafeToLinearHeading(new Vector2d(12, 4), Math.toRadians(-90))
-                .afterTime(0.0, new IntakeOn())
-                .strafeToLinearHeading(new Vector2d(12, -29), Math.toRadians(-90))
-                .afterTime(0.5, new IntakeOff())
-                .strafeToLinearHeading(new Vector2d(-10, -30), Math.toRadians(-0)) // open gate
-                .afterTime(0.9, new SpinUpFlywheelMedium())
-                .afterTime(1.9, new ShootClose())
-                .strafeToLinearHeading(new Vector2d(-20, -4), Math.toRadians(-140))
-                .waitSeconds(1.2)
+        TrajectoryActionBuilder shootFirstSpike = intakeFirstSpike.endTrajectory().fresh()
+                .afterTime(0.6, new SpinUpFlywheelClose()) // spin up flywheel for close shooting
+                .setReversed(true)
+                .splineTo(new Vector2d(-30, -16), Math.toRadians(55)); // go to close shoot position
 
-                /* Third Spike */
-                .strafeToLinearHeading(new Vector2d(36, -2), Math.toRadians(-90))
-                .afterTime(0, new IntakeOn())
-                .strafeToLinearHeading(new Vector2d(36, -34), Math.toRadians(-90))
-                .afterTime(0, new IntakeOff())
-                .afterTime(0.7, new SpinUpFlywheelMedium())
-                .afterTime(1.5, new ShootClose())
-                .strafeToLinearHeading(new Vector2d(-22, -6), Math.toRadians(-137))
-                .waitSeconds(0.6)
+        TrajectoryActionBuilder openGate = shootFirstSpike.endTrajectory().fresh()
+                .setReversed(false)
+                .splineTo(new Vector2d(-4, -53), Math.toRadians(270)) // open gate
+                .waitSeconds(1) // wait for a second so the gate can open
+                .setReversed(true)
+                .splineTo(new Vector2d(3, -3), Math.toRadians(90)); // prepare to intake at second spike mark
 
-                /* HP Zone */
-                .strafeToLinearHeading(new Vector2d(30, -36), Math.toRadians(-30))
-                .afterTime(0, new IntakeOn())
-                .strafeToLinearHeading(new Vector2d(72, -54), Math.toRadians(-0))
-                .afterTime(0, new IntakeOff()).
-                afterTime(0.6, new SpinUpFlywheelMedium())
-                .afterTime(2.7, new ShootClose())
-                .strafeToLinearHeading(new Vector2d(-23, -7), Math.toRadians(-134))
-                .waitSeconds(0.75)
+        TrajectoryActionBuilder intakeSecondSpike = openGate.endTrajectory().fresh()
+                .setReversed(false)
+                .splineTo(new Vector2d(13, -34), Math.toRadians(270)); // intake at second spike mark
+
+        TrajectoryActionBuilder shootSecondSpike = intakeSecondSpike.endTrajectory().fresh()
+                .afterTime(0.6, new SpinUpFlywheelClose()) // spin up flywheel for close shooting
+                .setReversed(false)
+                .setReversed(true)
+                .splineTo(new Vector2d(-30, -16), Math.toRadians(55)); // go to close shoot position
+
+        TrajectoryActionBuilder intakeThirdSpikeBack = shootSecondSpike.endTrajectory().fresh()
+                .turnTo(Math.toRadians(210)) // turn so there is no interference with the opposite side
+                .setReversed(true)
+                .splineTo(new Vector2d(38, -10), Math.toRadians(45)); // prepare to intake at third spike mark
+
+        TrajectoryActionBuilder intakeThirdSpike = intakeThirdSpikeBack.endTrajectory().fresh()
+                .setReversed(false)
+                .splineTo(new Vector2d(38, -32), Math.toRadians(270)); // intake at third spike mark
+
+        TrajectoryActionBuilder shootThirdSpike = intakeThirdSpike.endTrajectory().fresh()
+                .afterTime(0.6, new SpinUpFlywheelFar()) // spin up flywheel for far shooting
+                .setReversed(true)
+                .splineTo(new Vector2d(56, -14), Math.toRadians(20)); // go to far shoot position
+
+        TrajectoryActionBuilder intakeHPZone = shootThirdSpike.endTrajectory().fresh()
+                .setReversed(false)
+                .splineTo(new Vector2d(62, -46), Math.toRadians(270)); // intake at hp zone
+
+        TrajectoryActionBuilder shootHPZone = intakeHPZone.endTrajectory().fresh()
+                .afterTime(0.6, new SpinUpFlywheelFar()) // spin up flywheel for far shooting
+                .setReversed(true)
+                .splineTo(new Vector2d(54, -14), Math.toRadians(22)); // go to far shoot position
 
 
 
-                /* Park */
-                .strafeToLinearHeading(new Vector2d(-5, -16), Math.toRadians(-90))
 
-                ;
-
-
+        // .strafeToLinearHeading(new Vector2d(5, 20), 90);
 
         waitForStart();
         while(opModeIsActive()) {
@@ -253,7 +233,36 @@ public class BlueCloseM1GM2M3FHF extends LinearOpMode {
 
             Actions.runBlocking(
                     new SequentialAction(
-                            shootPreload.build()
+                            shootPreload.build(),
+                            new ShootClose(),
+
+                            new IntakeOn(),
+                            intakeFirstSpike.build(),
+                            new IntakeOff(),
+                            shootFirstSpike.build(),
+                            new ShootClose(),
+
+                            openGate.build(),
+
+                            new IntakeOn(),
+                            intakeSecondSpike.build(),
+                            new IntakeOff(),
+                            shootSecondSpike.build(),
+                            new ShootClose(),
+
+                            intakeThirdSpikeBack.build(),
+                            new IntakeOn(),
+                            intakeThirdSpike.build(),
+                            new IntakeOff(),
+                            shootThirdSpike.build(),
+                            new ShootFar(),
+
+                            new IntakeOn(),
+                            intakeHPZone.build(),
+                            new IntakeOff(),
+                            shootHPZone.build(),
+                            new ShootFar()
+
                     )
             );
 

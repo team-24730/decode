@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.rusteze.autos;
+package org.firstinspires.ftc.teamcode.rusteze.autos.archived;
 
 import androidx.annotation.NonNull;
 
@@ -19,7 +19,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.MecanumDrive;
-import org.firstinspires.ftc.teamcode.rusteze.Robot;
+import org.firstinspires.ftc.teamcode.rusteze.subsystems.Robot;
 import org.firstinspires.ftc.teamcode.rusteze.RobotConstants;
 
 @Autonomous(name="15 Artifact Blue Auto Testing")

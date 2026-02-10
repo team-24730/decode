@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.rusteze.autos;
+package org.firstinspires.ftc.teamcode.rusteze.autos.archived;
 
 import androidx.annotation.NonNull;
 
@@ -15,12 +15,12 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.MecanumDrive;
-import org.firstinspires.ftc.teamcode.rusteze.Robot;
+import org.firstinspires.ftc.teamcode.rusteze.subsystems.Robot;
 import org.firstinspires.ftc.teamcode.rusteze.RobotConstants;
 
 @Disabled
-@Autonomous(name="Blue Buddy Close M2GM1M3MHM", group="main")
-public class BlueBuddyCloseC2GM1M3MHM extends LinearOpMode {
+@Autonomous(name="Red Buddy Close M2GM1M3MHM", group="main")
+public class RedBuddyCloseC2GM1M3MHM extends LinearOpMode {
 
     public void runOpMode() {
 
@@ -187,42 +187,42 @@ public class BlueBuddyCloseC2GM1M3MHM extends LinearOpMode {
         }
 
 
-        Pose2d initialPose = new Pose2d(-56, -34, Math.toRadians(-127.8));
+        Pose2d initialPose = new Pose2d(-56, 34, Math.toRadians(127.8));
         MecanumDrive drive = new MecanumDrive(hardwareMap, initialPose);
 
         TrajectoryActionBuilder shootPreload = drive.actionBuilder(initialPose)
                 /* Preloads */
                 .afterTime(0, new SpinUpFlywheelMedium())
                 .afterTime(1.4, new ShootClose())
-                .strafeToLinearHeading(new Vector2d(-18, -4), Math.toRadians(-135)) // shoot preload
+                .strafeToLinearHeading(new Vector2d(-18, 4), Math.toRadians(135)) // shoot preload
                 .waitSeconds(1.0) // see if time can be saved
 
                 /* Second Spike */
                 .afterTime(1, new IntakeOn())
-                .strafeToLinearHeading(new Vector2d(6, -6), Math.toRadians(-90))
-                .strafeToLinearHeading(new Vector2d(6, -36), Math.toRadians(-90))
+                .strafeToLinearHeading(new Vector2d(6, 6), Math.toRadians(90))
+                .strafeToLinearHeading(new Vector2d(6, 36), Math.toRadians(90))
                 .afterTime(1.0, new IntakeOff())
-                .strafeToLinearHeading(new Vector2d(-2, -60), Math.toRadians(-0)) // open gate
+                .strafeToLinearHeading(new Vector2d(-2, 60), Math.toRadians(0)) // open gate
                 .waitSeconds(1.0)
                 .afterTime(0.5, new SpinUpFlywheelMedium())
-                .strafeToLinearHeading(new Vector2d(6, -6), Math.toRadians(-0))
+                .strafeToLinearHeading(new Vector2d(6, 6), Math.toRadians(0))
                 .afterTime(1.6, new ShootClose())
-                .strafeToLinearHeading(new Vector2d(-22, -4), Math.toRadians(-130))
+                .strafeToLinearHeading(new Vector2d(-22, 4), Math.toRadians(130))
                 .waitSeconds(1.0)
 
                 /* First Spike */
                 .afterTime(0.6, new IntakeOn())
-                .splineTo(new Vector2d(-14, -50), Math.toRadians(-90))
+                .splineTo(new Vector2d(-14, 50), Math.toRadians(90))
                 .afterTime(0.2, new IntakeOff())
-                .strafeToLinearHeading(new Vector2d(-2, -60), Math.toRadians(-180)) // open gate
+                .strafeToLinearHeading(new Vector2d(-2, 60), Math.toRadians(180)) // open gate
                 .waitSeconds(1.0)
                 .afterTime(0.5, new SpinUpFlywheelMedium())
                 .afterTime(1.3, new ShootClose())
-                .strafeToLinearHeading(new Vector2d(-22, -4), Math.toRadians(-130))
+                .strafeToLinearHeading(new Vector2d(-22, 4), Math.toRadians(130))
                 .waitSeconds(1.0)
 
                 /* Park */
-                .strafeToLinearHeading(new Vector2d(-5, -16), Math.toRadians(-90))
+                .strafeToLinearHeading(new Vector2d(-5, 16), Math.toRadians(90))
 
                 ;
 

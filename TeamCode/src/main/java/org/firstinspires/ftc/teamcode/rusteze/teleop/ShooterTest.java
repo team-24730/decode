@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.rusteze;
+package org.firstinspires.ftc.teamcode.rusteze.teleop;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.rusteze.RobotConstants;
 
 
 @TeleOp(name="Shooter Test")

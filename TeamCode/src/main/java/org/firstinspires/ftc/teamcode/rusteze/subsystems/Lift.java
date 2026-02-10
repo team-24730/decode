@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.rusteze;
+package org.firstinspires.ftc.teamcode.rusteze.subsystems;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -24,8 +24,8 @@ public class Lift {
 
     public void extend() {
         //if (!extended) {
-            leftLift.setPosition(0.78);
-            rightLift.setPosition(0.78);
+            leftLift.setPosition(0.5);
+            rightLift.setPosition(0.5);
             extended = true;
         //}
     }

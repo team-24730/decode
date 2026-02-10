@@ -1,10 +1,12 @@
-package org.firstinspires.ftc.teamcode.rusteze;
+package org.firstinspires.ftc.teamcode.rusteze.subsystems;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+
+import org.firstinspires.ftc.teamcode.rusteze.RobotConstants;
 
 public class Outtake {
     private DcMotorEx flywheelTop;
@@ -13,7 +15,7 @@ public class Outtake {
 
     public double currentRPM = 0;
 
-    double targetRPM = 0;
+    public double targetRPM = 0;
     public boolean useControlSystem = true;
     private double rawPower = 0;
 

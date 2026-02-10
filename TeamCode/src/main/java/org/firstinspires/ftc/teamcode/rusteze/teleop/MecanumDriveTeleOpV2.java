@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.rusteze;
+package org.firstinspires.ftc.teamcode.rusteze.teleop;
 
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
@@ -6,6 +6,11 @@ import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
+import org.firstinspires.ftc.teamcode.rusteze.subsystems.Intake;
+import org.firstinspires.ftc.teamcode.rusteze.utility.PIDF;
+import org.firstinspires.ftc.teamcode.rusteze.RobotConstants;
+import org.firstinspires.ftc.teamcode.rusteze.subsystems.RobotV2;
 
 import java.util.List;
 
@@ -188,18 +193,14 @@ public class MecanumDriveTeleOpV2 extends LinearOpMode {
                 robot.turret.initializeTurret();
             }
 
-            if (gamepad1.dpad_up) {
-                robot.turret.setTargetPosition(359);
+            if (gamepad2.right_bumper && robot.turret.getTargetPosition() < 360) {
+                robot.turret.setTargetPosition(robot.turret.getTargetPosition() + 1);
+            } else if (gamepad2.left_bumper && robot.turret.getTargetPosition() > 0) {
+                robot.turret.setTargetPosition(robot.turret.getTargetPosition() - 1);
             }
-            if (gamepad1.dpad_down) {
-                robot.turret.setTargetPosition(10);
-            }
-            if (gamepad1.dpad_left) {
-                robot.turret.setTargetPosition(-10);
-            }
-            if (gamepad1.dpad_right) {
-                robot.turret.setTargetPosition(0);
-            }
+
+            if (gamepad2.a) { robot.turret.setTargetPosition(0); }
+            if (gamepad2.y) { robot.turret.setTargetPosition(180); }
 
             robot.update();
 
