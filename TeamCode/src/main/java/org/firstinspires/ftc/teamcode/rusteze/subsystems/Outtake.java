@@ -50,10 +50,10 @@ public class Outtake {
 
     public void update() {
 
+        currentRPM = flywheelBottom.getVelocity() / TICKS_PER_REVOLUTION * 60;
         double flywheelPower;
         if (useControlSystem) {
-            // Calculate control system variables
-            currentRPM = flywheelBottom.getVelocity() / TICKS_PER_REVOLUTION * 60;                                  // Convert ticks per second to revolutions per minute
+            // Calculate control system variables                             // Convert ticks per second to revolutions per minute
             double errorRPM = targetRPM - currentRPM;
             double kV = constants.getkV();
             double kP = constants.getkP();
