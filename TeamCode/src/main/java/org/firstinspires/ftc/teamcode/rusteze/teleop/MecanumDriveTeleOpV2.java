@@ -1,33 +1,49 @@
 package org.firstinspires.ftc.teamcode.rusteze.teleop;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.teamcode.PinpointLocalizer;
 import org.firstinspires.ftc.teamcode.rusteze.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.rusteze.utility.PIDF;
 import org.firstinspires.ftc.teamcode.rusteze.RobotConstants;
 import org.firstinspires.ftc.teamcode.rusteze.subsystems.RobotV2;
 
 import java.util.List;
-
+import java.util.concurrent.TimeUnit;
 
 @TeleOp(name="MecanumDriveTeleOp V2")
 public class MecanumDriveTeleOpV2 extends LinearOpMode {
     private final ElapsedTime runtime = new ElapsedTime();
+    private final ElapsedTime relocalizationTime = new ElapsedTime();
     double outtakeTarget = 0.0;
     boolean intakeToggle = false;
     RobotConstants constants = new RobotConstants();
     RobotConstants.Color teamColor = constants.teamColor;
     int currentID = 24;
+    GoBildaPinpointDriver driver;
+
+    FtcDashboard dashboard = FtcDashboard.getInstance();
+    Telemetry dashboardTelemetry = dashboard.getTelemetry();
 
     private Limelight3A limelight;
     private double lastTx = 0;
     private double lowPassYaw = 0;
     private PIDF limelight_PIDF = new PIDF(0.01, 0.035, 0.0025, 0.25, 0.5);
+    private double limelightXPos = 0;
+    private double limelightYPos = 0;
+    private double limelightAngle = 0;
+
 
     @Override
     public void runOpMode() {
@@ -38,21 +54,19 @@ public class MecanumDriveTeleOpV2 extends LinearOpMode {
         limelight.pipelineSwitch(8);
         limelight.start();
 
+        //robot.drivetrain.resetPosition();
+
         waitForStart();
         runtime.reset();
         while(opModeIsActive()) {
 
 
             // ARTIFACT INTAKING CODE //
-            if (gamepad1.backWasPressed() && robot.getState() == RobotV2.State.IDLE && robot.intake.getState() != Intake.State.INTAKE) {
+
+            /*if (gamepad1.backWasPressed() && robot.getState() == RobotV2.State.IDLE || robot.getState() == RobotV2.State.INTAKE) {
                 robot.setState(RobotV2.State.INTAKE);
                 robot.intake.reverse();
-            } else if (gamepad1.backWasPressed() && robot.getState() == RobotV2.State.INTAKE && robot.intake.getState() != Intake.State.REVERSE) {
-                robot.intake.disable();
-                robot.setState(RobotV2.State.IDLE);
-            }
-
-
+            }*/
 
             if (gamepad1.leftBumperWasPressed() && (robot.getState() == RobotV2.State.IDLE || robot.getState() == RobotV2.State.INTAKE)) {
                 if (robot.intake.getState() == Intake.State.IDLE) {
@@ -83,7 +97,7 @@ public class MecanumDriveTeleOpV2 extends LinearOpMode {
                 }
                 if (gamepad1.xWasPressed()) {
                     robot.setState(RobotV2.State.SHOOTING);
-                    robot.outtake.setTarget(2800); //3200
+                    robot.outtake.setTarget(2800); //       2800
                     robot.outtake.setHood(0.97);
                     robot.outtake.useControlSystem = true;
                 }
@@ -106,7 +120,7 @@ public class MecanumDriveTeleOpV2 extends LinearOpMode {
                 robot.outtake.useControlSystem = false;
             }
 
-            if (robot.getState() == RobotV2.State.SHOOTING) {
+            /* if (robot.getState() == RobotV2.State.SHOOTING) {
                 LLResult result = limelight.getLatestResult();
                 if (result != null) {
                     if (result.isValid()) {
@@ -148,9 +162,9 @@ public class MecanumDriveTeleOpV2 extends LinearOpMode {
                     lowPassYaw = 0;
                 }
 
-                robot.drivetrain.setMotorPowers(-gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x + limelight_PIDF.calculate(lastTx), gamepad1.right_bumper);
+                robot.drivetrain.setMotorPowers(-gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x + limelight_PIDF.calculate(lastTx), gamepad1.right_bumper); */
 
-            } else if (robot.getState() != RobotV2.State.LIFT) {
+            /*} else*/ if (robot.getState() != RobotV2.State.LIFT) {
                 robot.drivetrain.setMotorPowers(-gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x, gamepad1.right_bumper);
             }
 
@@ -193,30 +207,112 @@ public class MecanumDriveTeleOpV2 extends LinearOpMode {
                 robot.turret.initializeTurret();
             }
 
-            if (gamepad2.right_bumper && robot.turret.getTargetPosition() < 360) {
+            /*if (gamepad2.right_bumper && robot.turret.getTargetPosition() < 360) {
                 robot.turret.setTargetPosition(robot.turret.getTargetPosition() + 1);
             } else if (gamepad2.left_bumper && robot.turret.getTargetPosition() > 0) {
                 robot.turret.setTargetPosition(robot.turret.getTargetPosition() - 1);
             }
 
             if (gamepad2.a) { robot.turret.setTargetPosition(0); }
-            if (gamepad2.y) { robot.turret.setTargetPosition(180); }
+            if (gamepad2.y) { robot.turret.setTargetPosition(180); } */
+
+            // PINPOINT TESTING
+            double xComponent = -65 - robot.drivetrain.getPosition().getX(DistanceUnit.INCH); // -57
+            double yComponent;
+            if (RobotConstants.teamColor == RobotConstants.Color.RED) {
+                yComponent = 65 - robot.drivetrain.getPosition().getY(DistanceUnit.INCH); // 60
+            } else {
+                yComponent = -65 - robot.drivetrain.getPosition().getY(DistanceUnit.INCH);
+            }
+            double goalAngle = -Math.toDegrees(Math.atan2(yComponent, xComponent)) + robot.drivetrain.getPosition().getHeading(AngleUnit.DEGREES);
+
+            if (robot.getState() == RobotV2.State.SHOOTING) {
+                robot.turret.setSmartTargetPosition(goalAngle);
+            }
+
+
+            // RELOCALIZATION STUFF
+            if (gamepad1.dpad_up && robot.getState() == RobotV2.State.IDLE) {
+                robot.setState(RobotV2.State.RELOCALIZING);
+                relocalizationTime.reset();
+                limelightXPos = -10000; // fake value for geometric mean stuff
+                limelightYPos = -10000; // fake value for geometric mean stuff
+                limelightAngle = -10000; // fake value for geometric mean stuff
+            }
+
+            if (gamepad1.dpad_down && robot.getState() != RobotV2.State.SHOOTING) { // press before relocalization
+                robot.turret.setTargetPosition(0);
+            }
+
+            if (robot.getState() == RobotV2.State.RELOCALIZING) {
+                double pastBias = 0.95;
+
+                if (relocalizationTime.time(TimeUnit.MILLISECONDS) < 1000) {
+                    telemetry.addLine("RELOCALIZING");
+                    LLResult result = limelight.getLatestResult();
+                    if (result != null) {
+                        if (result.isValid()) {
+                            if (limelightXPos == -10000) {
+                                limelightXPos = result.getBotpose().getPosition().x * 39.37;
+                            } else {
+                                limelightXPos = pastBias * limelightXPos + (1 - pastBias) * result.getBotpose().getPosition().x * 39.37; // geometric mean
+                            }
+                            if (limelightYPos == -10000) {
+                                limelightYPos = result.getBotpose().getPosition().y * 39.37;
+                            } else {
+                                limelightYPos = 0.95 * limelightYPos + (1 - pastBias) * result.getBotpose().getPosition().y * 39.37; // geometric mean
+                            }
+                            if (limelightAngle == -10000) {
+                                limelightAngle = result.getBotpose().getOrientation().getYaw(AngleUnit.DEGREES);
+                            } else {
+                                limelightAngle = 0.95 * limelightAngle + (1 - pastBias) * result.getBotpose().getOrientation().getYaw(AngleUnit.DEGREES);
+                            }
+
+                            telemetry.addData("X", limelightXPos);
+                            telemetry.addData("Y", limelightYPos);
+                            telemetry.addData("Angle", limelightAngle);
+                            telemetry.addData("Distance", Math.sqrt(Math.pow(-55.284868 - limelightXPos, 2) + Math.pow((RobotConstants.teamColor == RobotConstants.Color.BLUE ? -58.834503 : 58.834503) - limelightYPos, 2)));
+                        } else {
+                            telemetry.addLine("Invalid result");
+                        }
+                    } else {
+                        telemetry.addLine("Null result");
+                    }
+                } else {
+                    if (limelightXPos != -10000 && limelightYPos != -10000 && limelightAngle != -10000) {
+                        robot.drivetrain.setPosition(limelightXPos, limelightYPos, limelightAngle);
+                    }
+                    robot.setState(RobotV2.State.IDLE);
+                }
+            }
+
 
             robot.update();
 
             telemetry.addData("Current Color", RobotConstants.teamColor);
             telemetry.addData("Current State", robot.getState());
+            telemetry.addData("Lift Position", robot.lift.leftLift.getPosition());
 
             telemetry.addLine("------------------------------\nDEBUG INFORMATION:\n");
 
-            telemetry.addData("Current Intake State", robot.intake.getState());
-            telemetry.addData("TargetRPM", robot.outtake.targetRPM);
-            telemetry.addData("Lift Position", robot.lift.leftLift.getPosition());
+            //telemetry.addData("Current Intake State", robot.intake.getState());
+            //telemetry.addData("TargetRPM", robot.outtake.targetRPM);
             telemetry.addData("Flywheel Velocity", robot.outtake.currentRPM);
-            telemetry.addData("Current Turret Position", robot.turret.getPosition());
+            telemetry.addData("Current Turret Position (Degrees)", robot.turret.getPosition());
+            //telemetry.addData("Current Turret Position (Ticks)", robot.turret.getEncoderPosition());
             telemetry.addData("Targeted Turret Position", robot.turret.getTargetPosition());
             telemetry.addData("Turret Initialized", RobotConstants.turretInitialized);
+            telemetry.addData("Pinpoint X Pos", robot.drivetrain.getPosition().getX(DistanceUnit.INCH));
+            telemetry.addData("Pinpoint Y Pos", robot.drivetrain.getPosition().getY(DistanceUnit.INCH));
+            telemetry.addData("Pinpoint Angle", robot.drivetrain.getPosition().getHeading(AngleUnit.DEGREES));
+            telemetry.addData("Goal Angle", goalAngle);
             telemetry.update();
+
+            dashboardTelemetry.addData("Flywheel RPM", robot.outtake.currentRPM);
+            dashboardTelemetry.addData("Target RPM", robot.outtake.targetRPM);
+            dashboardTelemetry.addData("Zero", 0);
+            dashboardTelemetry.addData("Max", 6000);
+            dashboardTelemetry.update();
         }
     }
 
