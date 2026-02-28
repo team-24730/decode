@@ -10,9 +10,9 @@ import org.firstinspires.ftc.teamcode.rusteze.RobotConstants;
 public class Turret {
     public DcMotorEx turret;
     private double targetPosition;
-    private final double DEGREES_PER_TICK = 0.18; // 360/2000
+    private final double DEGREES_PER_TICK = 0.181215655; // 360/2000 (0.18) // NEW THEORETICAL VALUE: 360/1986.58333
     PID pid = new PID(0.05, 0, 0);
-    final double MAX_PID_OUTPUT = 0.4;
+    final double MAX_PID_OUTPUT = 0.6;
     final double hysteresis = 5; // extra degrees at the end of the turret range
     final double emergencyStop = 10; // amount of degrees the turret can go past 0 or 360 before it disables
 
@@ -27,6 +27,10 @@ public class Turret {
 
     public double getPosition() {
         return turret.getCurrentPosition() * DEGREES_PER_TICK;
+    }
+
+    public double getEncoderPosition() {
+        return turret.getCurrentPosition();
     }
 
     public double getTargetPosition() {
