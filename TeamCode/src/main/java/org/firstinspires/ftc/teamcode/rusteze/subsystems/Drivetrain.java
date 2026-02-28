@@ -1,15 +1,22 @@
 package org.firstinspires.ftc.teamcode.rusteze.subsystems;
 
+import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
+import org.firstinspires.ftc.teamcode.PinpointLocalizer;
 
 public final class Drivetrain {
     private DcMotorEx frontLeft;
     private DcMotorEx backLeft;
     private DcMotorEx backRight;
     private DcMotorEx frontRight;
+    private GoBildaPinpointDriver pinpoint;
 
     public Drivetrain(HardwareMap hwMap) {
         frontLeft  = hwMap.get(DcMotorEx.class, "frontLeft" );
@@ -26,6 +33,10 @@ public final class Drivetrain {
         backLeft  .setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         backRight .setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        pinpoint = hwMap.get(GoBildaPinpointDriver.class, "pinpoint");
+        pinpoint.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.REVERSED);
+        pinpoint.resetPosAndIMU();
     }
 
     public void setMotorPowers (double axial, double lateral, double rotation, boolean slowEnabled) {
@@ -35,8 +46,8 @@ public final class Drivetrain {
 
         if (slowEnabled) {
             y = y * 0.2;
-            x = x * 0.2;
-            rx = rx * 0.2;
+            x = x * 0.3;
+            rx = rx * 0.4;
         }
 
         double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
@@ -54,5 +65,19 @@ public final class Drivetrain {
 
     public double driveCorrection(double x) {
         return 1.1 * (x * x * Math.signum(x) + 0.15 * x);
+    }
+
+    public Pose2D getPosition() {
+        return pinpoint.getPosition();
+    }
+
+    public void setPosition(double xPos, double yPos, double angle) {pinpoint.setPosition(new Pose2D(DistanceUnit.INCH, xPos , yPos, AngleUnit.DEGREES, angle));}
+
+    public void resetPosition() {
+        pinpoint.resetPosAndIMU();
+    }
+
+    public void update() {
+        pinpoint.update();
     }
 }
