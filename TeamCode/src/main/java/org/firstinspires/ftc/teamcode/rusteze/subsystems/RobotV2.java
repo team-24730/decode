@@ -13,7 +13,8 @@ public class RobotV2 {
         IDLE,
         INTAKE,
         SHOOTING,
-        LIFT
+        LIFT,
+        RELOCALIZING
     }
     State robotState = State.IDLE;
 
@@ -37,5 +38,6 @@ public class RobotV2 {
         intake.update();
         outtake.update();
         turret.update();
+        drivetrain.update();
     }
 }
