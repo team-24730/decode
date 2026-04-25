@@ -10,6 +10,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.PinpointLocalizer;
+import org.firstinspires.ftc.teamcode.rusteze.RobotConstants;
 
 public final class Drivetrain {
     private DcMotorEx frontLeft;
@@ -69,6 +70,14 @@ public final class Drivetrain {
 
     public Pose2D getPosition() {
         return pinpoint.getPosition();
+    }
+
+    public double getGoalDistance(RobotConstants.Color color) {
+        if (color == RobotConstants.Color.RED) {
+            return Math.sqrt(Math.pow(-65 - getPosition().getX(DistanceUnit.INCH), 2) + Math.pow(65 - getPosition().getY(DistanceUnit.INCH), 2));
+        } else {
+            return Math.sqrt(Math.pow(-65 - getPosition().getX(DistanceUnit.INCH), 2) + Math.pow(-65 - getPosition().getY(DistanceUnit.INCH), 2));
+        }
     }
 
     public void setPosition(double xPos, double yPos, double angle) {pinpoint.setPosition(new Pose2D(DistanceUnit.INCH, xPos , yPos, AngleUnit.DEGREES, angle));}
