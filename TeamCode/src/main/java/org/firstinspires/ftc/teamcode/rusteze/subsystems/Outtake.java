@@ -40,8 +40,9 @@ public class Outtake {
             targetRPM = target;
     }
 
-    public void setHood(double target) {
-        hood.setPosition(target);
+    public void
+    setHood(double target) {
+        hood.setPosition(Math.min(Math.max(0.25, target), 0.97));
     }
 
     public void setPower(double power) {
