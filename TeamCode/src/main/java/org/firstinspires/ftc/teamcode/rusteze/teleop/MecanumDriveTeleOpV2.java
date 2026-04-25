@@ -18,6 +18,7 @@ import org.firstinspires.ftc.teamcode.rusteze.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.rusteze.utility.PIDF;
 import org.firstinspires.ftc.teamcode.rusteze.RobotConstants;
 import org.firstinspires.ftc.teamcode.rusteze.subsystems.RobotV2;
+import org.firstinspires.ftc.teamcode.rusteze.utility.RegressionContainer;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -27,11 +28,13 @@ public class MecanumDriveTeleOpV2 extends LinearOpMode {
     private final ElapsedTime runtime = new ElapsedTime();
     private final ElapsedTime relocalizationTime = new ElapsedTime();
     double outtakeTarget = 0.0;
+    double servoTarget = 0.0;
     boolean intakeToggle = false;
     RobotConstants constants = new RobotConstants();
     RobotConstants.Color teamColor = constants.teamColor;
     int currentID = 24;
     GoBildaPinpointDriver driver;
+    private double goalDistance;
 
     FtcDashboard dashboard = FtcDashboard.getInstance();
     Telemetry dashboardTelemetry = dashboard.getTelemetry();
@@ -60,24 +63,28 @@ public class MecanumDriveTeleOpV2 extends LinearOpMode {
         runtime.reset();
         while(opModeIsActive()) {
 
+            // GOAL DISTANCE CALCULATION
+            if (RobotConstants.teamColor == RobotConstants.Color.RED) {
+                goalDistance = Math.sqrt(Math.pow(-65 - robot.drivetrain.getPosition().getX(DistanceUnit.INCH), 2) + Math.pow(65 - robot.drivetrain.getPosition().getY(DistanceUnit.INCH), 2));
+            } else {
+                goalDistance = Math.sqrt(Math.pow(-65 - robot.drivetrain.getPosition().getX(DistanceUnit.INCH), 2) + Math.pow(-65 - robot.drivetrain.getPosition().getY(DistanceUnit.INCH), 2));
+            }
+
 
             // ARTIFACT INTAKING CODE //
-
-            /*if (gamepad1.backWasPressed() && robot.getState() == RobotV2.State.IDLE || robot.getState() == RobotV2.State.INTAKE) {
-                robot.setState(RobotV2.State.INTAKE);
-                robot.intake.reverse();
-            }*/
-
             if (gamepad1.leftBumperWasPressed() && (robot.getState() == RobotV2.State.IDLE || robot.getState() == RobotV2.State.INTAKE)) {
                 if (robot.intake.getState() == Intake.State.IDLE) {
                     robot.setState(RobotV2.State.INTAKE);
-                    robot.intake.enable();
-                } else if (robot.intake.getState() == Intake.State.INTAKE) {
+                    if (gamepad1.back) {
+                        robot.intake.reverse();
+                    } else {
+                        robot.intake.enable();
+                    }
+                } else if (robot.intake.getState() == Intake.State.INTAKE || robot.intake.getState() == Intake.State.REVERSE) {
                     robot.setState(RobotV2.State.IDLE);
                     robot.intake.disable();
                 }
             }
-
 
 
             // ARTIFACT TRANSFER SHOOTING CODE //
@@ -89,30 +96,60 @@ public class MecanumDriveTeleOpV2 extends LinearOpMode {
                 }
             }
 
+            /* // OUTTAKE AND SERVO LIVE ADJUSTMENT CONTROLS
+            if (gamepad2.yWasPressed()) {
+                outtakeTarget += 100;
+            }
+            if (gamepad2.xWasPressed()) {
+                outtakeTarget += 10;
+            }
+            if (gamepad2.aWasPressed()) {
+                outtakeTarget -= 100;
+            }
+            if (gamepad2.bWasPressed()) {
+                outtakeTarget -= 10;
+            }
+
+            if (gamepad2.dpadUpWasPressed()) {
+                servoTarget += 0.1;
+            }
+            if (gamepad2.dpadLeftWasPressed()) {
+                servoTarget += 0.01;
+            }
+            if (gamepad2.dpadDownWasPressed()) {
+                servoTarget -= 0.1;
+            }
+            if (gamepad2.dpadRightWasPressed()) {
+                servoTarget -= 0.01;
+            } */
+
+
             // FLYWHEEL VELOCITY AND HOOD CODE //
             if (robot.getState() == RobotV2.State.IDLE || robot.getState() == RobotV2.State.SHOOTING) {
                 if (gamepad1.aWasPressed()) {
                     robot.setState(RobotV2.State.IDLE);
                     robot.intake.disable();
                 }
-                if (gamepad1.xWasPressed()) {
+                /*if (gamepad1.xWasPressed()) {
                     robot.setState(RobotV2.State.SHOOTING);
-                    robot.outtake.setTarget(2800); //       2800
-                    robot.outtake.setHood(0.97);
+                    robot.outtake.setTarget(outtakeTarget); //    2800
+                    robot.outtake.setHood(servoTarget);   //    0.97
                     robot.outtake.useControlSystem = true;
-                }
+                } */
                 if (gamepad1.yWasPressed()) {
                     robot.setState(RobotV2.State.SHOOTING);
-                    robot.outtake.setTarget(3800);
-                    robot.outtake.setHood(0.25);
                     robot.outtake.useControlSystem = true;
                 }
-                if (gamepad1.bWasPressed()) {
+                /*if (gamepad1.bWasPressed()) {
                     robot.setState(RobotV2.State.SHOOTING);
                     robot.outtake.setTarget(4400);
                     robot.outtake.setHood(0.25);
                     robot.outtake.useControlSystem = true;
-                }
+                }*/
+            }
+            if (robot.getState() == RobotV2.State.SHOOTING) {
+                robot.outtake.setTarget(RegressionContainer.getFlywheelRPM(robot.drivetrain.getGoalDistance(teamColor)));
+                robot.outtake.setHood(RegressionContainer.getHoodPosition(robot.drivetrain.getGoalDistance(teamColor)) + 0.1);
             }
 
             if (robot.getState() == RobotV2.State.IDLE) {
@@ -297,7 +334,7 @@ public class MecanumDriveTeleOpV2 extends LinearOpMode {
 
             //telemetry.addData("Current Intake State", robot.intake.getState());
             //telemetry.addData("TargetRPM", robot.outtake.targetRPM);
-            telemetry.addData("Flywheel Velocity", robot.outtake.currentRPM);
+            telemetry.addData("Current Flywheel Velocity", robot.outtake.currentRPM);
             telemetry.addData("Current Turret Position (Degrees)", robot.turret.getPosition());
             //telemetry.addData("Current Turret Position (Ticks)", robot.turret.getEncoderPosition());
             telemetry.addData("Targeted Turret Position", robot.turret.getTargetPosition());
@@ -305,14 +342,16 @@ public class MecanumDriveTeleOpV2 extends LinearOpMode {
             telemetry.addData("Pinpoint X Pos", robot.drivetrain.getPosition().getX(DistanceUnit.INCH));
             telemetry.addData("Pinpoint Y Pos", robot.drivetrain.getPosition().getY(DistanceUnit.INCH));
             telemetry.addData("Pinpoint Angle", robot.drivetrain.getPosition().getHeading(AngleUnit.DEGREES));
-            telemetry.addData("Goal Angle", goalAngle);
+            telemetry.addData("Goal Distance", robot.drivetrain.getGoalDistance(teamColor));
+
+            //telemetry.addData("Goal Angle", goalAngle);
             telemetry.update();
 
-            dashboardTelemetry.addData("Flywheel RPM", robot.outtake.currentRPM);
-            dashboardTelemetry.addData("Target RPM", robot.outtake.targetRPM);
-            dashboardTelemetry.addData("Zero", 0);
-            dashboardTelemetry.addData("Max", 6000);
-            dashboardTelemetry.update();
+            //dashboardTelemetry.addData("Flywheel RPM", robot.outtake.currentRPM);
+            //dashboardTelemetry.addData("Target RPM", robot.outtake.targetRPM);
+            //dashboardTelemetry.addData("Zero", 0);
+            //dashboardTelemetry.addData("Max", 6000);
+            //dashboardTelemetry.update();
         }
     }
 
