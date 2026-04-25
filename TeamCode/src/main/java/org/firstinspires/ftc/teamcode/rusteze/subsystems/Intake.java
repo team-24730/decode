@@ -53,6 +53,18 @@ public class Intake {
         state = State.TRANSFER;
     }
 
+    public void autoFarTransfer() {
+        intake.setPower(0.6);
+        engageClutch();
+        state = State.TRANSFER;
+    }
+
+    public void autoTransfer() {
+        intake.setPower(0.8);
+        engageClutch();
+        state = State.TRANSFER;
+    }
+
     public void disable() {
         state = State.IDLE;
         intake.setPower(0);
