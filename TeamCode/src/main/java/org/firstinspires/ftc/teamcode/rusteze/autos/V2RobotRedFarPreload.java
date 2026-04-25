@@ -10,6 +10,7 @@ import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -17,6 +18,7 @@ import org.firstinspires.ftc.teamcode.MecanumDrive;
 import org.firstinspires.ftc.teamcode.rusteze.RobotConstants;
 import org.firstinspires.ftc.teamcode.rusteze.subsystems.RobotV2;
 
+@Disabled
 @Autonomous(name="Red Far Preload Only", group="main")
 public class V2RobotRedFarPreload extends LinearOpMode {
 
