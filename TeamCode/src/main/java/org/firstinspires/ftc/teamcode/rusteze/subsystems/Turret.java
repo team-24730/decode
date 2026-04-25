@@ -98,7 +98,12 @@ public class Turret {
             }
 
             double turretPower = pid.calculate(targetPosition - getPosition());
-            turret.setPower(Math.max(Math.min(turretPower, MAX_PID_OUTPUT), -MAX_PID_OUTPUT));
+            if (Math.abs(turretPower) < 0.05) {
+                turret.setPower(0);
+            } else {
+                turret.setPower(Math.max(Math.min(turretPower, MAX_PID_OUTPUT), -MAX_PID_OUTPUT));
+            }
+
 
         } else {
             turret.setPower(0);
