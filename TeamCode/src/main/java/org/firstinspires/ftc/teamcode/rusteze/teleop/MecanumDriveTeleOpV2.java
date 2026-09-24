@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode.rusteze.teleop;
 
-import com.acmerobotics.dashboard.FtcDashboard;
+//import com.acmerobotics.dashboard.FtcDashboard;
 import com.qualcomm.hardware.gobilda.GoBildaPinpointDriver;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
@@ -36,8 +36,8 @@ public class MecanumDriveTeleOpV2 extends LinearOpMode {
     GoBildaPinpointDriver driver;
     private double goalDistance;
 
-    FtcDashboard dashboard = FtcDashboard.getInstance();
-    Telemetry dashboardTelemetry = dashboard.getTelemetry();
+    //FtcDashboard dashboard = FtcDashboard.getInstance();
+    //Telemetry dashboardTelemetry = dashboard.getTelemetry();
 
     private Limelight3A limelight;
     private double lastTx = 0;
