@@ -10,6 +10,7 @@ public class Intake {
     Servo clutch;
     public boolean clutchEnabled;
     long timestamp;
+    public Servo gate;
 
 
     public enum State {
@@ -24,6 +25,8 @@ public class Intake {
         intake = hwMap.get(DcMotorEx.class, "intake");
         intake.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         clutch = hwMap.get(Servo.class, "clutch");
+
+        gate = hwMap.get(Servo.class, "gate");
     }
 
     public State getState() { return state; }
@@ -79,4 +82,13 @@ public class Intake {
             intake.setPower(1);
         }
     }
+
+    public void openGate() {
+        gate.setPosition(0.6);
+    }
+
+    public void closeGate() {
+        gate.setPosition(0.78);
+    }
+
 }
